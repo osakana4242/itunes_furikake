@@ -133,4 +133,11 @@
   <data name="StrErrTrack2" xml:space="preserve">
     <value>一部のトラックの更新に失敗しています。詳細はログをご覧ください。</value>
   </data>
+  <data name="StrAppInfo" xml:space="preserve">
+    <value>${app.displayName}
+バージョン: ${app.version}
+
+作：三途の川おさかな
+Web： http://www15.plala.or.jp/sasimi/</value>
+  </data>
 </root>

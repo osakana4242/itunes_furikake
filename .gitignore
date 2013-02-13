@@ -1,6 +1,5 @@
-project/itunes_furikake/obj
-project/itunes_furikake/bin/Debug/log
-project/itunes_furikake/bin/Debug/dict
 *.pdb
 *.suo
 *.pfx
+project/itunes_furikake/bin/*
+project/itunes_furikake/obj/*

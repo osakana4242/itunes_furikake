@@ -50,43 +50,62 @@ namespace jp.osakana4242.itunes_furikake
         [STAThread]
         static void Main()
         {
-            cleanFiles();
 
-            logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake init.");
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            RubyAdder rubyAdder = new RubyAdder();
+            bool createdNew;
+            //Mutexクラスの作成
+            System.Threading.Mutex mutex = new System.Threading.Mutex(true, "jp.osakana4242.itunes_furikake", out createdNew);
+            if (createdNew == false)
+            {
+                //ミューテックスの初期所有権が付与されなかったときは
+                //すでに起動していると判断して終了
+                ErrorDialog.Show("エラー", "多重起動は出来ません。");
+                return;
+            }
             try
             {
-                rubyAdder.Init();
-                RootForm form = new RootForm(rubyAdder);
-                Application.Run(form);
-            }
-            catch (AppDisplayableException ex)
-            {
-                ErrorDialog.Show("エラー",
-                    ex.displayMessage
-                );
-            }
-            catch (FileNotFoundException ex)
-            {
-                string BR = System.Environment.NewLine;
-                ErrorDialog.Show("エラー",
-                    ex.FileName + " が見つかりません。"
-                );
-            }
-            catch (Exception ex)
-            {
-                string BR = System.Environment.NewLine;
-                ErrorDialog.Show("エラー",
-                    ex.ToString()
-                );
+                cleanFiles();
+
+                logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake init.");
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                RubyAdder rubyAdder = new RubyAdder();
+                try
+                {
+                    rubyAdder.Init();
+                    RootForm form = new RootForm(rubyAdder);
+                    Application.Run(form);
+                }
+                catch (AppDisplayableException ex)
+                {
+                    ErrorDialog.Show("エラー",
+                        ex.displayMessage
+                    );
+                }
+                catch (FileNotFoundException ex)
+                {
+                    string BR = System.Environment.NewLine;
+                    ErrorDialog.Show("エラー",
+                        ex.FileName + " が見つかりません。"
+                    );
+                }
+                catch (Exception ex)
+                {
+                    string BR = System.Environment.NewLine;
+                    ErrorDialog.Show("エラー",
+                        ex.ToString()
+                    );
+                }
+                finally
+                {
+                    rubyAdder.Exit();
+                    logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake exit.");
+                    logger.Close();
+                }
             }
             finally
             {
-                rubyAdder.Exit();
-                logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake eixt.");
-                logger.Close();
+                //ミューテックスを解放する
+                mutex.ReleaseMutex();
             }
         }
 
@@ -464,13 +483,17 @@ TRACK_END:
                     if (cols.Length != 2)
                     {
                         // 不正な行。
+                        if (cols.Length == 1)
+                        {
+                            throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "タブが不足しています。"));
+                        }
                         continue;
                     }
                     string key = cols[0];
                     string value = cols[1];
                     if (dict.ContainsKey(key))
                     {
-                        throw new AppDisplayableException("[ " + filename + " ]内で[ " + key + " ]が重複しています。(" + lineCnt + "行目)");
+                        throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "[ " + key + " ]が重複しています。"));
                     }
                     else
                     {
@@ -478,6 +501,10 @@ TRACK_END:
                     }
                 }
             }
+        }
+        public static string makeReadDictErrorMessage(string fileName, int lineCnt, string line, string message)
+        {
+            return (message + "場所: " + fileName + " - " + lineCnt + "行目 - " + line);
         }
 
     }

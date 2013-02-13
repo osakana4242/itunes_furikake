@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="itunes_furikake.exe" size="31744">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="itunes_furikake.exe" size="32256">
       <assemblyIdentity name="itunes_furikake" version="2.1.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>heS7BSXXbBmzGUhrUHMGx0z0pEA=</dsig:DigestValue>
+        <dsig:DigestValue>V7LudZsWtT6xbrKDNe66u0chN2U=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

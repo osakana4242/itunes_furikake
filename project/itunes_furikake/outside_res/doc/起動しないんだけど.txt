@@ -1,0 +1,3 @@
+iTunesふりかけを実行するには以下のプログラムをインストールする必要があります。
+・iTunes
+・Microsoft .NET Framework 4 Client Profile

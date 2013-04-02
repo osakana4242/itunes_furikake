@@ -13,6 +13,14 @@ using jp.osakana4242.core.LogOperator;
 
 namespace jp.osakana4242.itunes_furikake
 {
+
+    static class NumberUtil
+    {
+        public static int Percent(int a, int b) {
+            return a * 100 / b;
+        }
+    }
+
     /// <summary>
     /// ユーザに表示可能なコメントを持つ例外クラス.
     /// </summary>
@@ -259,6 +267,7 @@ namespace jp.osakana4242.itunes_furikake
             int targetTrackNum = tracks.Count;
             int endFieldNum = 0;
             // int targetFieldNum = tracks.Count * TrackFieldNames.Length;
+            
             foreach (IITFileOrCDTrack track in tracks)
             {
                 if (bgWorker != null)
@@ -270,11 +279,23 @@ namespace jp.osakana4242.itunes_furikake
                     }
                 }
                 // 1トラック分の処理.
+                string trackName = null;
+                try
+                {
+                    trackName = track.Name;
+                }
+                catch (Exception ex)
+                {
+                    logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
+                }
+
+                if (bgWorker != null)
+                {
+                    state.Log = string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, br);
+                    bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), state);
+                }
+
                 StringBuilder sb = new StringBuilder();
-                sb.Append(endTrackNum + 1)
-                    .Append(":")
-                    .Append(track.Name)
-                    .Append(br);
                 foreach (string fieldName in TrackFieldNames)
                 {
                     string fieldValue = RubyAdder.GetField(track, fieldName);
@@ -297,7 +318,7 @@ namespace jp.osakana4242.itunes_furikake
                             catch (Exception ex)
                             {
                                 // トラックが編集できない.
-                                logger.TraceEvent(TraceEventType.Error, 0, "track can't edit. ex:" + ex.Message);
+                                logger.TraceEvent(TraceEventType.Error, 0, "トラックを編集出来ません. ex:" + ex.Message);
                                 this.exceptionList.Add(ex);
                                 sb.Append(ex.Message).Append(br);
                                 goto TRACK_END;
@@ -327,7 +348,7 @@ TRACK_END:
                     //コントロールの表示を変更する
                     state.Text = "" + endTrackNum + "/" + targetTrackNum;
                     state.Log = sb.ToString();
-                    bgWorker.ReportProgress(endTrackNum * 100 / targetTrackNum, state);
+                    bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), state);
                 }
             }
 

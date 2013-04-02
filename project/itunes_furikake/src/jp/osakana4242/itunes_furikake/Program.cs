@@ -46,6 +46,23 @@ namespace jp.osakana4242.itunes_furikake
 
     }
 
+    public class TrackFieldCantGetException : Exception
+    {
+        public TrackFieldCantGetException(Exception ex)
+            : base("TrackFieldCantGetException", ex)
+        {
+        }
+    }
+
+    public class TrackFieldCantSetException : Exception
+    {
+        Exception ex;
+        public TrackFieldCantSetException(Exception ex)
+            : base("TrackFieldCantSetException", ex)
+        {
+        }
+    }
+
     static class Program
     {
 
@@ -254,7 +271,6 @@ namespace jp.osakana4242.itunes_furikake
                 e.Result = result;
             }
 
-            ProgressDialogState state = new ProgressDialogState();
             this.Ope = ope;
             IITTrackCollection tracks = this.iTunesApp.SelectedTracks;
             if (tracks == null)
@@ -264,8 +280,8 @@ namespace jp.osakana4242.itunes_furikake
                 return;
             }
             int endTrackNum = 0;
+            int errorTrackNum = 0;
             int targetTrackNum = tracks.Count;
-            int endFieldNum = 0;
             // int targetFieldNum = tracks.Count * TrackFieldNames.Length;
             
             foreach (IITFileOrCDTrack track in tracks)
@@ -279,77 +295,81 @@ namespace jp.osakana4242.itunes_furikake
                     }
                 }
                 // 1トラック分の処理.
-                string trackName = null;
+                StringBuilder sb = new StringBuilder();
                 try
                 {
-                    trackName = track.Name;
-                }
-                catch (Exception ex)
-                {
-                    logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
-                }
-
-                if (bgWorker != null)
-                {
-                    state.Log = string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, br);
-                    bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), state);
-                }
-
-                StringBuilder sb = new StringBuilder();
-                foreach (string fieldName in TrackFieldNames)
-                {
-                    string fieldValue = RubyAdder.GetField(track, fieldName);
-                    string curRuby = RubyAdder.GetSortField(track, fieldName);
-                    string nextRuby = curRuby;
-                    bool isWrite = this.IsForceAdd || curRuby.Length <= 0 || this.Ope == OPE.CLEAR;
-                    if (isWrite)
+                    string trackName = null;
+                    try
                     {
-                        nextRuby = this.MakeSortField(fieldValue);
-                        if (nextRuby == curRuby)
+                        trackName = track.Name;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
+                    }
+                    if (bgWorker != null)
+                    {
+                        bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, br)));
+                    }
+                    foreach (string fieldName in TrackFieldNames)
+                    {
+                        string fieldValue = RubyAdder.GetField(track, fieldName);
+                        string curRuby = RubyAdder.GetSortField(track, fieldName);
+                        string nextRuby = curRuby;
+                        bool isWrite = this.IsForceAdd || curRuby.Length <= 0 || this.Ope == OPE.CLEAR;
+                        if (isWrite)
                         {
-                            // 変化無し。
-                        }
-                        else
-                        {
-                            try
+                            nextRuby = this.MakeSortField(fieldValue);
+                            if (nextRuby == curRuby)
+                            {
+                                // 変化無し。
+                            }
+                            else
                             {
                                 RubyAdder.SetSortField(track, fieldName, nextRuby);
                             }
-                            catch (Exception ex)
-                            {
-                                // トラックが編集できない.
-                                logger.TraceEvent(TraceEventType.Error, 0, "トラックを編集出来ません. ex:" + ex.Message);
-                                this.exceptionList.Add(ex);
-                                sb.Append(ex.Message).Append(br);
-                                goto TRACK_END;
-                            }
                         }
+                        sb.Append("[ ")
+                            .Append(fieldValue)
+                            .Append(" ]")
+                            .Append(" -> ")
+                            .Append("[ ")
+                            .Append(nextRuby)
+                            .Append(" ]");
+                        if (!isWrite)
+                        {
+                            sb.Append("(スキップ)");
+                        }
+                        sb.Append(br);
                     }
-                    sb.Append("[ ")
-                        .Append(fieldValue)
-                        .Append(" ]")
-                        .Append(" -> ")
-                        .Append("[ ")
-                        .Append(nextRuby)
-                        .Append(" ]");
-                    if (!isWrite)
-                    {
-                        sb.Append("(スキップ)");
-                    }
-                    sb.Append(br);
-                    endFieldNum += 1;
                 }
-TRACK_END:
-
-                endTrackNum += 1;
-                if (bgWorker != null)
+                catch (Exception ex)
                 {
-                    //ProgressChangedイベントハンドラを呼び出し、
-                    //コントロールの表示を変更する
-                    state.Text = "" + endTrackNum + "/" + targetTrackNum;
-                    state.Log = sb.ToString();
-                    bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), state);
+                    // なんかエラー
+                    logger.TraceEvent(TraceEventType.Error, 0, "トラックエラー. ex:" + ex.Message);
+                    this.exceptionList.Add(ex);
+                    sb.Append("トラックを編集出来ませんでした(スキップ)").Append(br);
+                    errorTrackNum += 1;
                 }
+                finally
+                {
+                    endTrackNum += 1;
+                    if (bgWorker != null)
+                    {
+                        //ProgressChangedイベントハンドラを呼び出し、
+                        //コントロールの表示を変更する
+                        bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(String.Format("{0}/{1}", endTrackNum, targetTrackNum), sb.ToString()));
+                    }
+                }
+            }
+
+            if (bgWorker != null)
+            {
+                string log = br
+                    + "エラートラック数: " + errorTrackNum + br
+                    + "総トラック数: " + endTrackNum + br
+                    ;
+                bgWorker.ReportProgress(NumberUtil.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, log));
             }
 
             System.Threading.Thread.Sleep(500);
@@ -358,7 +378,6 @@ TRACK_END:
             {
                 result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
                 result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack2;
-                return;
             }
         }
 
@@ -443,27 +462,41 @@ TRACK_END:
 
         public static string GetField(IITFileOrCDTrack track, string fieldName)
         {
-            string ret = (string)track.GetType().InvokeMember(fieldName, BindingFlags.GetProperty, null, track, null);
-            if (ret != null)
+            try
             {
-                return ret;
+                string ret = (string)track.GetType().InvokeMember(fieldName, BindingFlags.GetProperty, null, track, null);
+                if (ret != null)
+                {
+                    return ret;
+                }
+                else
+                {
+                    return "";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return "";
+                throw new TrackFieldCantGetException(ex);
             }
         }
 
         public static string GetSortField(IITFileOrCDTrack track, string fieldName)
         {
-            string ret = (string)track.GetType().InvokeMember("Sort" + fieldName, BindingFlags.GetProperty, null, track, null);
-            if (ret != null)
+            try
             {
-                return ret;
+                string ret = (string)track.GetType().InvokeMember("Sort" + fieldName, BindingFlags.GetProperty, null, track, null);
+                if (ret != null)
+                {
+                    return ret;
+                }
+                else
+                {
+                    return "";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return "";
+                throw new TrackFieldCantGetException(ex);
             }
         }
 
@@ -478,8 +511,7 @@ TRACK_END:
             }
             catch (Exception ex)
             {
-                string br = System.Environment.NewLine;
-                throw new AppDisplayableException("トラックの編集が出来ませんでした。[" + track.Name + "]" + br + "詳細情報:" + ex);
+                throw new TrackFieldCantSetException(ex);
             }
         }
 

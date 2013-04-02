@@ -47,8 +47,14 @@ namespace jp.osakana4242.itunes_furikake
             if (e.UserState != null)
             {
                 ProgressDialogState state = (ProgressDialogState)e.UserState;
-                this.label1.Text = state.Text;
-                this.rootForm.addLog(state.Log);
+                if (state.Text != null)
+                {
+                    this.label1.Text = state.Text;
+                }
+                if (state.Log != null)
+                {
+                    this.rootForm.addLog(state.Log);
+                }
             }
         }
 
@@ -93,6 +99,11 @@ namespace jp.osakana4242.itunes_furikake
     {
         public string Text = "";
         public string Log = "";
+        public ProgressDialogState(string text, string log)
+        {
+            this.Text = text;
+            this.Log = log;
+        }
     }
 
     public class ProgressResult

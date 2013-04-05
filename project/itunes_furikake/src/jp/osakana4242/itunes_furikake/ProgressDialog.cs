@@ -81,7 +81,7 @@ namespace jp.osakana4242.itunes_furikake
 
         private void ProgressDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (this.result.message != null)
+            if (this.result != null && this.result.message != null)
             {
                 MessageBox.Show(this.result.message, this.result.title);
             }

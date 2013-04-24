@@ -74,7 +74,6 @@ namespace jp.osakana4242.itunes_furikake
         [STAThread]
         static void Main()
         {
-
             bool createdNew;
             //Mutexクラスの作成
             System.Threading.Mutex mutex = new System.Threading.Mutex(true, "jp.osakana4242.itunes_furikake", out createdNew);
@@ -107,14 +106,14 @@ namespace jp.osakana4242.itunes_furikake
                 }
                 catch (FileNotFoundException ex)
                 {
-                    string BR = System.Environment.NewLine;
+                    var BR = System.Environment.NewLine;
                     ErrorDialog.Show("エラー",
                         ex.FileName + " が見つかりません。"
                     );
                 }
                 catch (Exception ex)
                 {
-                    string BR = System.Environment.NewLine;
+                    var BR = System.Environment.NewLine;
                     ErrorDialog.Show("エラー",
                         ex.ToString()
                     );
@@ -163,6 +162,28 @@ namespace jp.osakana4242.itunes_furikake
                     logger.TraceEvent(TraceEventType.Error, 0, path + " can't delete. " + ex.Message);
                 }
             }
+        }
+    }
+
+    public class StringUtil
+    {
+        /// <summary>
+        /// 指定文字列に含まれるのがアスキーコードのみなら true
+        /// </summary>
+        public static bool IsAscii(string str)
+        {
+            foreach (var c in str)
+            {
+                if (!IsAscii(c))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public static bool IsAscii(char c)
+        {
+            return c <= 0x7f;
         }
     }
 
@@ -428,7 +449,16 @@ namespace jp.osakana4242.itunes_furikake
         */
         private string toHiragana(string src)
         {
-            string dest = this.imeLanguage.GetYomi(src);
+            string dest;
+            if (StringUtil.IsAscii(src))
+            {
+                // 変換不要.
+                dest = "";
+            }
+            else
+            {
+                dest = this.imeLanguage.GetYomi(src);
+            }
             return dest;
         }
 

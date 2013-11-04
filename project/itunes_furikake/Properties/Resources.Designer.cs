@@ -93,7 +93,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   MicrosoftIMEをインストールしてください。
+        ///   &apos;Microsoft IME&apos;をインストールしてください。
         ///&apos;{0}&apos;のCLSIDが取得できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrErrMSIME1 {

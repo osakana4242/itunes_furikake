@@ -24,6 +24,7 @@ namespace emanual.IME
     private const int FELANG_REQ_REV = 0x00030000;
     private const int FELANG_CMODE_PINYIN = 0x00000100;
     private const int FELANG_CMODE_NOINVISIBLECHAR = 0x40000000;
+    private const string MSIME_APP_NAME = "MSIME.Japan";
 
     [DllImport("ole32.dll")]
     private static extern int CLSIDFromString([MarshalAs(UnmanagedType.LPWStr)] string lpsz, out Guid pclsid);
@@ -53,11 +54,11 @@ namespace emanual.IME
 
       // 文字列の CLSID から CLSID へのポインタを取得する
       Guid pclsid;
-      res = CLSIDFromString("MSIME.Japan", out pclsid);
+      res = CLSIDFromString(MSIME_APP_NAME, out pclsid);
 
       if (res != S_OK)
       {
-          throw new Exception("CLSIDが取得できません。");
+          throw new Exception(string.Format(global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrMSIME1, MSIME_APP_NAME));
       }
 
       Guid riid = new Guid("019F7152-E6DB-11D0-83C3-00C04FDDB82E ");
@@ -65,7 +66,7 @@ namespace emanual.IME
 
       if (res != S_OK)
       {
-          throw new Exception("インスタンスが作成できません。");
+          throw new Exception(string.Format(global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrMSIME2, MSIME_APP_NAME));
       }
 
     }

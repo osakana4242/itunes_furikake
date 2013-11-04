@@ -143,4 +143,11 @@ Web： http://osakana4242.yokochou.com/</value>
   <data name="StrExecuting" xml:space="preserve">
     <value>処理中</value>
   </data>
+  <data name="StrErrMSIME1" xml:space="preserve">
+    <value>MicrosoftIMEをインストールしてください。
+'{0}'のCLSIDが取得できません。</value>
+  </data>
+  <data name="StrErrMSIME2" xml:space="preserve">
+    <value>'{0}'のインスタンスが作成できません。</value>
+  </data>
 </root>

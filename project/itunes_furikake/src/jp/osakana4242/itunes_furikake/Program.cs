@@ -202,6 +202,7 @@ namespace jp.osakana4242.itunes_furikake
             KATAKANA,
             ALPHABET,
             CLEAR,
+            ZEN2HAN,
         };
         public static string[] TrackFieldNames = {
             "Name",
@@ -214,15 +215,20 @@ namespace jp.osakana4242.itunes_furikake
 
         public OPE Ope = OPE.CLEAR;
         public bool IsForceAdd = false; // ルビを強制的に振るか。
+        /** ついでに半角化. */
+        public bool IsZen2Han = false;
         private static object[] tempArg1 = { null }; // InvokeMember で渡す単一の引数。
         private Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
         private Dictionary<string, string> dictHiragana2Katakana = new Dictionary<string, string>();
         private Dictionary<string, string> dictWord2Hiragana = new Dictionary<string, string>();
+        private Dictionary<char, char> dictZen2Han = new Dictionary<char, char>();
         private AddLog _addLog = null;
         public List<Exception> exceptionList = new List<Exception>();
+        DoWorkEventHandler doWorkEventHandler;
 
         public RubyAdder()
         {
+            doWorkEventHandler = BackgroundWorker1_DoWork;
         }
 
         // ログの出力先を設定.
@@ -244,6 +250,7 @@ namespace jp.osakana4242.itunes_furikake
             RubyAdder.ReadDict(this.dictHiragana2Rome, "dict/dict_h2r.txt");
             RubyAdder.ReadDict(this.dictHiragana2Katakana, "dict/dict_h2k.txt");
             RubyAdder.ReadDict(this.dictWord2Hiragana, "dict/dict_word2h.txt");
+            RubyAdder.ReadDict(this.dictZen2Han, "dict/dict_zen2han.txt");
             this.imeLanguage = new emanual.IME.ImeLanguage();
             this.iTunesApp = new iTunesApp();
         }
@@ -263,9 +270,9 @@ namespace jp.osakana4242.itunes_furikake
         }
 
 
-        public DoWorkEventHandler makeDoWorkEventHandler()
+        public DoWorkEventHandler getDoWorkEventHandler()
         {
-            return new DoWorkEventHandler(this.BackgroundWorker1_DoWork);
+            return doWorkEventHandler;
         }
 
         //BackgroundWorker1のDoWorkイベントハンドラ
@@ -336,32 +343,93 @@ namespace jp.osakana4242.itunes_furikake
                         {
                             string fieldValue = RubyAdder.GetField(track, fieldName);
                             string curRuby = RubyAdder.GetSortField(track, fieldName);
-                            string nextRuby = curRuby;
-                            bool isWrite = this.IsForceAdd || curRuby.Length <= 0 || this.Ope == OPE.CLEAR;
-                            if (isWrite)
+                            string nextFieldValue = fieldValue;
+                            bool isNeedSetRuby = false;
+                            if (this.Ope == OPE.ZEN2HAN)
                             {
-                                nextRuby = this.MakeSortField(fieldValue);
-                                if (nextRuby == curRuby)
+                                nextFieldValue = toHankaku(fieldValue);
+                                if (fieldValue != nextFieldValue)
                                 {
-                                    // 変化無し。
+                                    // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
+                                    RubyAdder.SetField(track, fieldName, nextFieldValue + "_");
+                                    RubyAdder.SetField(track, fieldName, nextFieldValue);
+                                    // フィールドが更新されると、よみがながリセットされてしまうので、変更が無くても設定し直す必要がある.
+                                    isNeedSetRuby = true;
                                 }
-                                else
+
+                                string nextRuby = curRuby;
                                 {
-                                    RubyAdder.SetSortField(track, fieldName, nextRuby);
+                                    nextRuby = toHankaku(curRuby);
+                                    if (nextRuby == curRuby || !isNeedSetRuby)
+                                    {
+                                        // 変化無し。
+                                    }
+                                    else
+                                    {
+                                        // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
+                                        RubyAdder.SetSortField(track, fieldName, nextRuby + "_");
+                                        RubyAdder.SetSortField(track, fieldName, nextRuby);
+                                    }
                                 }
+                                if (fieldValue != nextFieldValue)
+                                {
+                                    sb.Append("[ ")
+                                        .Append(fieldValue)
+                                        .Append(" ]")
+                                        .Append(" -> ")
+                                        .Append("[ ")
+                                        .Append(nextFieldValue)
+                                        .Append(" ]");
+                                    sb.Append(br);
+                                }
+                                if (fieldValue != nextRuby)
+                                {
+                                    sb.Append("[ ")
+                                        .Append(curRuby)
+                                        .Append(" ]")
+                                        .Append(" -> ")
+                                        .Append("[ ")
+                                        .Append(nextRuby)
+                                        .Append(" ]");
+                                }
+                                sb.Append(br);
                             }
-                            sb.Append("[ ")
-                                .Append(fieldValue)
-                                .Append(" ]")
-                                .Append(" -> ")
-                                .Append("[ ")
-                                .Append(nextRuby)
-                                .Append(" ]");
-                            if (!isWrite)
+                            else
                             {
-                                sb.Append("(スキップ)");
+                                string nextRuby = curRuby;
+                                bool isWrite = this.IsForceAdd || curRuby.Length <= 0 || this.Ope == OPE.CLEAR;
+                                if (isWrite)
+                                {
+                                    nextRuby = this.MakeSortField(nextFieldValue);
+                                    if (nextRuby == curRuby)
+                                    {
+                                        // 変化無し。
+                                    }
+                                    else
+                                    {
+                                        RubyAdder.SetSortField(track, fieldName, nextRuby);
+                                        string afterRuby = RubyAdder.GetSortField(track, fieldName);
+                                        if (nextRuby != afterRuby)
+                                        {
+                                            // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
+                                            RubyAdder.SetSortField(track, fieldName, nextRuby + "_");
+                                            RubyAdder.SetSortField(track, fieldName, nextRuby);
+                                        }
+                                    }
+                                }
+                                sb.Append("[ ")
+                                    .Append(fieldValue)
+                                    .Append(" ]")
+                                    .Append(" -> ")
+                                    .Append("[ ")
+                                    .Append(nextRuby)
+                                    .Append(" ]");
+                                if (!isWrite)
+                                {
+                                    sb.Append("(スキップ)");
+                                }
+                                sb.Append(br);
                             }
-                            sb.Append(br);
                         }
                     }
                     catch (Exception ex)
@@ -458,6 +526,7 @@ namespace jp.osakana4242.itunes_furikake
             else
             {
                 dest = this.imeLanguage.GetYomi(src);
+                dest = toHankaku(dest);
             }
             return dest;
         }
@@ -478,6 +547,22 @@ namespace jp.osakana4242.itunes_furikake
             return this.toHoge(hiragana, this.dictHiragana2Rome);
         }
 
+        /** 全角半角
+        */
+        private string toHankaku(string src)
+        {
+            var sb = new System.Text.StringBuilder(src.Length);
+            foreach (char c in src)
+            {
+                char nextC;
+                if (!dictZen2Han.TryGetValue(c, out nextC))
+                {
+                    nextC = c;
+                }
+                sb.Append(nextC);
+            }
+            return sb.ToString();
+        }
 
         /** 指定文字列を指定の辞書で置換.
        */
@@ -495,6 +580,12 @@ namespace jp.osakana4242.itunes_furikake
                 sb.Append(outS);
             }
             return sb.ToString();
+        }
+
+        /** 半角変換したら同じ文字になるか. */
+        private bool IsNeedSetDummyField(string nextLabel, string currentLabel)
+        {
+            return nextLabel == toHankaku(currentLabel);
         }
 
         public static string GetField(IITTrack track, string fieldName)
@@ -541,14 +632,31 @@ namespace jp.osakana4242.itunes_furikake
         */
         public static void SetSortField(IITTrack track, string fieldName, string value)
         {
+            SetField(track, "Sort" + fieldName, value);
+        }
+
+        public static void SetField(IITTrack track, string fieldName, string value)
+        {
             RubyAdder.tempArg1[0] = value;
             try
             {
-                track.GetType().InvokeMember("Sort" + fieldName, BindingFlags.SetProperty, null, track, RubyAdder.tempArg1);
+                track.GetType().InvokeMember(fieldName, BindingFlags.SetProperty, null, track, RubyAdder.tempArg1);
             }
             catch (Exception ex)
             {
                 throw new TrackFieldCantSetException(ex);
+            }
+        }
+
+        public static void ReadDict(Dictionary<char, char> dict, string filename)
+        {
+            var d = new Dictionary<string, string>();
+            ReadDict(d, filename);
+            foreach (var kv in d)
+            {
+                if (kv.Key.Length <= 0) continue;
+                if (kv.Value.Length <= 0) continue;
+                dict[kv.Key[0]] = kv.Value[0];
             }
         }
 

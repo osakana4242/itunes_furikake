@@ -60,7 +60,7 @@ namespace jp.osakana4242.itunes_furikake
         {
             console.Clear();
             this.Enabled = false;
-            ProgressDialog progressDialog = new ProgressDialog(this, this.rubyAdder.makeDoWorkEventHandler(), ope);
+            ProgressDialog progressDialog = new ProgressDialog(this, this.rubyAdder.getDoWorkEventHandler(), ope);
             progressDialog.Text = jp.osakana4242.itunes_furikake.Properties.Resources.StrExecuting;
             progressDialog.Show(this);
 //            this.rubyAdder.Exec(ope);
@@ -78,7 +78,17 @@ namespace jp.osakana4242.itunes_furikake
             this.console.AppendText(str);
         }
 
+        private void バージョン情報ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            VersionForm versionForm = new VersionForm();
+            versionForm.ShowDialog(this);
+            versionForm.Dispose();
+        }
 
+        private void 全角英数を半角にするToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            exec(RubyAdder.OPE.ZEN2HAN);
+        }
     }
 
 

@@ -13,69 +13,82 @@ using jp.osakana4242.core.LogOperator;
 
 namespace jp.osakana4242.itunes_furikake
 {
+    public enum RubyAdderOpeType
+    {
+        HIRAGANA,
+        KATAKANA,
+        ALPHABET,
+        CLEAR,
+        ZEN2HAN,
+    };
+
+    public class RubyAdderOpeData
+    {
+        public RubyAdderOpeType ope;
+        public bool isForceAdd;
+    }
+
     /// <summary>
     /// ルビを振る機能を提供.
     /// </summary>
     public class RubyAdder
     {
-        private static TraceSource logger = LogOperator.get();
+        public static TraceSource logger = LogOperator.get();
 
         public delegate void AddLog(string str);
 
-        public enum OPE
-        {
-            HIRAGANA,
-            KATAKANA,
-            ALPHABET,
-            CLEAR,
-        };
         public static string[] TrackFieldNames = {
             "Name",
             "Artist",
             "Album",
             "AlbumArtist",
         };
-        private iTunesApp iTunesApp;
-        private emanual.IME.ImeLanguage imeLanguage; // 読み仮名取得クラス。
+        public iTunesApp iTunesApp;
+        public emanual.IME.ImeLanguage imeLanguage; // 読み仮名取得クラス。
 
-        public OPE Ope = OPE.CLEAR;
-        public bool IsForceAdd = false; // ルビを強制的に振るか。
         private static object[] tempArg1 = { null }; // InvokeMember で渡す単一の引数。
-        private Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
-        private Dictionary<string, string> dictHiragana2Katakana = new Dictionary<string, string>();
-        private Dictionary<string, string> dictWord2Hiragana = new Dictionary<string, string>();
-        private Dictionary<char, char> dictZen2Han = new Dictionary<char, char>();
-        private AddLog _addLog = null;
+
+        public RubyAdderOpeData opeData = new RubyAdderOpeData();
+        public Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
+        public Dictionary<string, string> dictHiragana2Katakana = new Dictionary<string, string>();
+        public Dictionary<string, string> dictWord2Hiragana = new Dictionary<string, string>();
+        public Dictionary<char, char> dictZen2Han = new Dictionary<char, char>();
+
+        private AddLog addLog_ = null;
         public List<Exception> exceptionList = new List<Exception>();
-        DoWorkEventHandler doWorkEventHandler;
 
         public RubyAdder()
         {
-            doWorkEventHandler = BackgroundWorker1_DoWork;
         }
 
         // ログの出力先を設定.
         public void setLogger(AddLog addLog)
         {
-            this._addLog = addLog;
+            this.addLog_ = addLog;
         }
 
         private void addLog(string str)
         {
-            if (this._addLog != null)
+            if (this.addLog_ != null)
             {
-                this._addLog(str);
+                this.addLog_(str);
             }
         }
 
         public void Init()
         {
-            RubyAdder.ReadDict(this.dictHiragana2Rome, "dict/dict_h2r.txt");
-            RubyAdder.ReadDict(this.dictHiragana2Katakana, "dict/dict_h2k.txt");
-            RubyAdder.ReadDict(this.dictWord2Hiragana, "dict/dict_word2h.txt");
-            RubyAdder.ReadDict(this.dictZen2Han, "dict/dict_zen2han.txt");
+            dictHiragana2Rome = LoadHelper.ReadDictS("dict/dict_h2r.txt");
+            dictHiragana2Katakana = LoadHelper.ReadDictS("dict/dict_h2k.txt");
+            dictWord2Hiragana = LoadHelper.ReadDictS("dict/dict_word2h.txt");
+            dictZen2Han = LoadHelper.ReadDictC("dict/dict_zen2han.txt");
+
             this.imeLanguage = new emanual.IME.ImeLanguage();
             this.iTunesApp = new iTunesApp();
+        }
+
+        static void Reallocate<K, V>( ref Dictionary<K, V> dict )
+        {
+            dict = new Dictionary<K, V>(dict);
         }
 
         public void Exit()
@@ -93,38 +106,27 @@ namespace jp.osakana4242.itunes_furikake
         }
 
 
-        public DoWorkEventHandler getDoWorkEventHandler()
-        {
-            return doWorkEventHandler;
-        }
-
         //BackgroundWorker1のDoWorkイベントハンドラ
         //ここで時間のかかる処理を行う
-        public void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        public static readonly DoWorkEventHandler doWorkEventHandler = (object sender, DoWorkEventArgs e) =>
         {
-            this.Exec((OPE)e.Argument, (BackgroundWorker)sender, e);
-        }
+            Exec((BackgroundWorker)sender, e);
+        };
 
-        public void Exec(OPE ope)
+        public static void Exec(BackgroundWorker bgWorker, DoWorkEventArgs e)
         {
-            this.Exec(ope, null, null);
-        }
-
-        public void Exec(OPE ope, BackgroundWorker bgWorker, DoWorkEventArgs e)
-        {
+            RubyAdder rubyAdder = (RubyAdder)e.Argument;
             ProgressResult result = new ProgressResult();
             try
             {
-                this.exceptionList.Clear();
+                rubyAdder.exceptionList.Clear();
 
                 string br = System.Environment.NewLine;
                 if (e != null)
                 {
                     e.Result = result;
                 }
-
-                this.Ope = ope;
-                IITTrackCollection tracks = this.iTunesApp.SelectedTracks;
+                IITTrackCollection tracks = rubyAdder.iTunesApp.SelectedTracks;
                 if (tracks == null)
                 {
                     result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
@@ -168,9 +170,9 @@ namespace jp.osakana4242.itunes_furikake
                             string curRuby = RubyAdder.GetSortField(track, fieldName);
                             string nextFieldValue = fieldValue;
                             bool isNeedSetRuby = false;
-                            if (this.Ope == OPE.ZEN2HAN)
+                            if (rubyAdder.opeData.ope == RubyAdderOpeType.ZEN2HAN)
                             {
-                                nextFieldValue = toHankaku(fieldValue);
+                                nextFieldValue = ConvertHelper.ToHankaku(rubyAdder, fieldValue);
                                 if (fieldValue != nextFieldValue)
                                 {
                                     // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
@@ -182,7 +184,7 @@ namespace jp.osakana4242.itunes_furikake
 
                                 string nextRuby = curRuby;
                                 {
-                                    nextRuby = toHankaku(curRuby);
+                                    nextRuby = ConvertHelper.ToHankaku(rubyAdder, curRuby);
                                     if (nextRuby == curRuby || !isNeedSetRuby)
                                     {
                                         // 変化無し。
@@ -220,10 +222,10 @@ namespace jp.osakana4242.itunes_furikake
                             else
                             {
                                 string nextRuby = curRuby;
-                                bool isWrite = this.IsForceAdd || curRuby.Length <= 0 || this.Ope == OPE.CLEAR;
+                                bool isWrite = rubyAdder.opeData.isForceAdd || curRuby.Length <= 0 || rubyAdder.opeData.ope == RubyAdderOpeType.CLEAR;
                                 if (isWrite)
                                 {
-                                    nextRuby = this.MakeSortField(nextFieldValue);
+                                    nextRuby = ConvertHelper.MakeSortField(rubyAdder, nextFieldValue);
                                     if (nextRuby == curRuby)
                                     {
                                         // 変化無し。
@@ -259,7 +261,7 @@ namespace jp.osakana4242.itunes_furikake
                     {
                         // なんかエラー
                         logger.TraceEvent(TraceEventType.Error, 0, "トラックエラー. ex:" + ex.Message);
-                        this.exceptionList.Add(ex);
+                        rubyAdder.exceptionList.Add(ex);
                         sb.Append("トラックを編集出来ませんでした(スキップ)").Append(br);
                         errorTrackNum += 1;
                     }
@@ -286,7 +288,7 @@ namespace jp.osakana4242.itunes_furikake
 
                 System.Threading.Thread.Sleep(500);
 
-                if (0 < this.exceptionList.Count)
+                if (0 < rubyAdder.exceptionList.Count)
                 {
                     result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
                     result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack2;
@@ -298,117 +300,6 @@ namespace jp.osakana4242.itunes_furikake
                 result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
                 result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrUnknown;
             }
-        }
-
-        public string MakeSortField(string baseField)
-        {
-            if (this.Ope == OPE.CLEAR)
-            {
-                return "";
-            }
-            if (0 < baseField.Length)
-            {
-                string ruby = "";
-                // 単語リストから変換。
-                if (!this.dictWord2Hiragana.TryGetValue(baseField, out ruby))
-                {
-                    ruby = baseField;
-                }
-
-                switch (this.Ope)
-                {
-                    case OPE.HIRAGANA:
-                        ruby = this.toHiragana(ruby);
-                        break;
-                    case OPE.KATAKANA:
-                        ruby = this.toKatakana(ruby);
-                        break;
-                    case OPE.ALPHABET:
-                        ruby = this.toAlphabet(ruby);
-                        break;
-                }
-                System.Console.WriteLine(ruby);
-                return ruby;
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        /** ひらがな化。
-        */
-        private string toHiragana(string src)
-        {
-            string dest;
-            if (StringHelper.IsAscii(src))
-            {
-                // 変換不要.
-                dest = "";
-            }
-            else
-            {
-                dest = this.imeLanguage.GetYomi(src);
-                dest = toHankaku(dest);
-            }
-            return dest;
-        }
-
-        /** カタカナ化。
-        */
-        private string toKatakana(string src)
-        {
-            string hiragana = this.toHiragana(src);
-            return this.toHoge(hiragana, this.dictHiragana2Katakana);
-        }
-
-        /** アルファベット化。
-        */
-        private string toAlphabet(string src)
-        {
-            string hiragana = this.toHiragana(src);
-            return this.toHoge(hiragana, this.dictHiragana2Rome);
-        }
-
-        /** 全角半角
-        */
-        private string toHankaku(string src)
-        {
-            var sb = new System.Text.StringBuilder(src.Length);
-            foreach (char c in src)
-            {
-                char nextC;
-                if (!dictZen2Han.TryGetValue(c, out nextC))
-                {
-                    nextC = c;
-                }
-                sb.Append(nextC);
-            }
-            return sb.ToString();
-        }
-
-        /** 指定文字列を指定の辞書で置換.
-       */
-        private string toHoge(string src, Dictionary<string, string> hToHoge)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (char c in src)
-            {
-                string s = c.ToString();
-                string outS = s;
-                if (!hToHoge.TryGetValue(s, out outS))
-                {
-                    outS = s;
-                }
-                sb.Append(outS);
-            }
-            return sb.ToString();
-        }
-
-        /** 半角変換したら同じ文字になるか. */
-        private bool IsNeedSetDummyField(string nextLabel, string currentLabel)
-        {
-            return nextLabel == toHankaku(currentLabel);
         }
 
         public static string GetField(IITTrack track, string fieldName)
@@ -470,63 +361,5 @@ namespace jp.osakana4242.itunes_furikake
                 throw new TrackFieldCantSetException(ex);
             }
         }
-
-        public static void ReadDict(Dictionary<char, char> dict, string filename)
-        {
-            var d = new Dictionary<string, string>();
-            ReadDict(d, filename);
-            foreach (var kv in d)
-            {
-                if (kv.Key.Length <= 0) continue;
-                if (kv.Value.Length <= 0) continue;
-                dict[kv.Key[0]] = kv.Value[0];
-            }
-        }
-
-        /** 辞書にファイルの内容を読み込む。
-        */
-        public static void ReadDict(Dictionary<string, string> dict, string filename)
-        {
-            logger.TraceEvent(TraceEventType.Information, 0, "ReadDict - " + filename);
-            using (StreamReader r = new StreamReader(filename, System.Text.Encoding.UTF8))
-            {
-                string line;
-                int lineCnt = 0;
-                while ((line = r.ReadLine()) != null) // 1行ずつ読み出し。
-                {
-                    lineCnt += 1;
-                    logger.TraceEvent(TraceEventType.Verbose, 0, line);
-                    string[] cols = line.Split('\t');
-                    if (line.Length <= 0 || line.IndexOf("#") == 0)
-                    {
-                        continue;
-                    }
-                    if (cols.Length != 2)
-                    {
-                        // 不正な行。
-                        if (cols.Length == 1)
-                        {
-                            throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "タブが不足しています。"));
-                        }
-                        continue;
-                    }
-                    string key = cols[0];
-                    string value = cols[1];
-                    if (dict.ContainsKey(key))
-                    {
-                        throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "[ " + key + " ]が重複しています。"));
-                    }
-                    else
-                    {
-                        dict.Add(key, value);
-                    }
-                }
-            }
-        }
-        public static string makeReadDictErrorMessage(string fileName, int lineCnt, string line, string message)
-        {
-            return (message + "場所: " + fileName + " - " + lineCnt + "行目 - " + line);
-        }
-
     }
 }

@@ -27,25 +27,25 @@ namespace jp.osakana4242.itunes_furikake
         // ボタン：ひらがな.
         private void button1_Click(object sender, EventArgs e)
         {
-            this.exec(RubyAdder.OPE.HIRAGANA);
+            this.exec(RubyAdderOpeType.HIRAGANA);
         }
 
         // ボタン：カタカナ.
         private void button5_Click(object sender, EventArgs e)
         {
-            this.exec(RubyAdder.OPE.KATAKANA);
+            this.exec(RubyAdderOpeType.KATAKANA);
         }
 
         // ボタン：アルファベット.
         private void button2_Click(object sender, EventArgs e)
         {
-            this.exec(RubyAdder.OPE.ALPHABET);
+            this.exec(RubyAdderOpeType.ALPHABET);
         }
 
         // ボタン：クリア.
         private void button3_Click(object sender, EventArgs e)
         {
-            this.exec(RubyAdder.OPE.CLEAR);
+            this.exec(RubyAdderOpeType.CLEAR);
         }
 
         // ボタン：バージョン情報の表示.
@@ -56,11 +56,13 @@ namespace jp.osakana4242.itunes_furikake
             versionForm.Dispose();
         }
 
-        private void exec(RubyAdder.OPE ope)
+        private void exec(RubyAdderOpeType ope)
         {
             console.Clear();
             this.Enabled = false;
-            ProgressDialog progressDialog = new ProgressDialog(this, this.rubyAdder.getDoWorkEventHandler(), ope);
+            rubyAdder.opeData.ope = ope;
+            rubyAdder.opeData.isForceAdd = checkBox1.Checked;
+            ProgressDialog progressDialog = new ProgressDialog(this, RubyAdder.doWorkEventHandler, rubyAdder);
             progressDialog.Text = jp.osakana4242.itunes_furikake.Properties.Resources.StrExecuting;
             progressDialog.Show(this);
 //            this.rubyAdder.Exec(ope);
@@ -69,7 +71,6 @@ namespace jp.osakana4242.itunes_furikake
         // 強制書き換えチェックボックス。
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            this.rubyAdder.IsForceAdd = this.checkBox1.Checked;
         }
 
         // ユーザに見せるログを追加.
@@ -87,7 +88,7 @@ namespace jp.osakana4242.itunes_furikake
 
         private void 全角英数を半角にするToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            exec(RubyAdder.OPE.ZEN2HAN);
+            exec(RubyAdderOpeType.ZEN2HAN);
         }
     }
 

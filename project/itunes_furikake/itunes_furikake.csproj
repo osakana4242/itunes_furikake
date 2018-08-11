@@ -85,8 +85,10 @@
   <ItemGroup>
     <Compile Include="src\jp\osakana4242\core\LogOperator.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\Exception.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\LoadHelper.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdder.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\NumberHelper.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\ConvertHelper.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\StringHelper.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\VersionForm.cs">
       <SubType>Form</SubType>

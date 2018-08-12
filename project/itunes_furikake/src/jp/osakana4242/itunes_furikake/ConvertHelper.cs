@@ -17,38 +17,28 @@ namespace jp.osakana4242.itunes_furikake
     {
         public static string MakeSortField(RubyAdder rubyAdder, string baseField)
         {
-            if (rubyAdder.opeData.ope == RubyAdderOpeType.CLEAR)
-            {
-                return "";
-            }
-            if (0 < baseField.Length)
-            {
-                string ruby = "";
-                // 単語リストから変換。
-                if (!rubyAdder.dictWord2Hiragana.TryGetValue(baseField, out ruby))
-                {
-                    ruby = baseField;
-                }
+            if (baseField.Length <= 0) return "";
 
-                switch (rubyAdder.opeData.ope)
-                {
-                    case RubyAdderOpeType.HIRAGANA:
-                        ruby = ToHiragana(rubyAdder, ruby);
-                        break;
-                    case RubyAdderOpeType.KATAKANA:
-                        ruby = ToKatakana(rubyAdder, ruby);
-                        break;
-                    case RubyAdderOpeType.ALPHABET:
-                        ruby = ToAlphabet(rubyAdder, ruby);
-                        break;
-                }
-                System.Console.WriteLine(ruby);
-                return ruby;
-            }
-            else
+            string ruby = "";
+            // 単語リストから変換。
+            if (!rubyAdder.dictWord2Hiragana.TryGetValue(baseField, out ruby))
             {
-                return "";
+                ruby = baseField;
             }
+
+            switch (rubyAdder.opeData.ope)
+            {
+                case RubyAdderOpeType.HIRAGANA:
+                    ruby = ToHiragana(rubyAdder, ruby);
+                    break;
+                case RubyAdderOpeType.KATAKANA:
+                    ruby = ToKatakana(rubyAdder, ruby);
+                    break;
+                case RubyAdderOpeType.ALPHABET:
+                    ruby = ToAlphabet(rubyAdder, ruby);
+                    break;
+            }
+            return ruby;
         }
 
         /** ひらがな化。
@@ -58,8 +48,8 @@ namespace jp.osakana4242.itunes_furikake
             string dest;
             if (StringHelper.IsAscii(src))
             {
-                // 変換不要.
-                dest = "";
+                // 読みがな不要.
+                return "";
             }
             else
             {
@@ -125,10 +115,11 @@ namespace jp.osakana4242.itunes_furikake
             return sb.ToString();
         }
 
-        /** 半角変換したら同じ文字になるか. */
-        public static bool IsNeedSetDummyField(RubyAdder rubyAdder, string nextLabel, string currentLabel)
+        /** ダミー文字を混じえた変更が必要か. */
+        public static bool IsNeedSetDummyField(RubyAdder rubyAdder, string a, string b)
         {
-            return nextLabel == ToHankaku(rubyAdder, currentLabel);
+            if (ToHankaku(rubyAdder, a) != ToHankaku(rubyAdder, b)) return false;
+            return true;
         }
     }
 }

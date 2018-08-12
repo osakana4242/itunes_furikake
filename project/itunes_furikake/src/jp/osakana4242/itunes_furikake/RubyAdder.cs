@@ -33,20 +33,13 @@ namespace jp.osakana4242.itunes_furikake
     /// </summary>
     public class RubyAdder
     {
+        private static readonly string BR = System.Environment.NewLine;
         public static TraceSource logger = LogOperator.get();
 
-        public delegate void AddLog(string str);
+        public delegate void AddLogDelegate(string str);
 
-        public static string[] TrackFieldNames = {
-            "Name",
-            "Artist",
-            "Album",
-            "AlbumArtist",
-        };
         public iTunesApp iTunesApp;
         public emanual.IME.ImeLanguage imeLanguage; // 読み仮名取得クラス。
-
-        private static object[] tempArg1 = { null }; // InvokeMember で渡す単一の引数。
 
         public RubyAdderOpeData opeData = new RubyAdderOpeData();
         public Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
@@ -54,20 +47,19 @@ namespace jp.osakana4242.itunes_furikake
         public Dictionary<string, string> dictWord2Hiragana = new Dictionary<string, string>();
         public Dictionary<char, char> dictZen2Han = new Dictionary<char, char>();
 
-        private AddLog addLog_ = null;
-        public List<Exception> exceptionList = new List<Exception>();
+        private AddLogDelegate addLog_ = null;
 
         public RubyAdder()
         {
         }
 
         // ログの出力先を設定.
-        public void setLogger(AddLog addLog)
+        public void SetLogger(AddLogDelegate addLog)
         {
             this.addLog_ = addLog;
         }
 
-        private void addLog(string str)
+        private void AddLog(string str)
         {
             if (this.addLog_ != null)
             {
@@ -84,11 +76,6 @@ namespace jp.osakana4242.itunes_furikake
 
             this.imeLanguage = new emanual.IME.ImeLanguage();
             this.iTunesApp = new iTunesApp();
-        }
-
-        static void Reallocate<K, V>( ref Dictionary<K, V> dict )
-        {
-            dict = new Dictionary<K, V>(dict);
         }
 
         public void Exit()
@@ -113,15 +100,15 @@ namespace jp.osakana4242.itunes_furikake
             Exec((BackgroundWorker)sender, e);
         };
 
+
         public static void Exec(BackgroundWorker bgWorker, DoWorkEventArgs e)
         {
             RubyAdder rubyAdder = (RubyAdder)e.Argument;
             ProgressResult result = new ProgressResult();
             try
             {
-                rubyAdder.exceptionList.Clear();
+                List<Exception> exceptionList = new List<Exception>();
 
-                string br = System.Environment.NewLine;
                 if (e != null)
                 {
                     e.Result = result;
@@ -136,133 +123,37 @@ namespace jp.osakana4242.itunes_furikake
                 int endTrackNum = 0;
                 int errorTrackNum = 0;
                 int targetTrackNum = tracks.Count;
+                StringBuilder sb = new StringBuilder();
                 // int targetFieldNum = tracks.Count * TrackFieldNames.Length;
-                foreach (IITTrack track in tracks)
+                foreach (IITTrack trackBase in tracks)
                 {
-                    if (bgWorker != null)
-                    {
-                        if (bgWorker.CancellationPending)
-                        {
-                            // 中断。
-                            return;
-                        }
-                    }
+                    // 中断.
+                    if (bgWorker.CancellationPending) return;
                     // 1トラック分の処理.
-                    StringBuilder sb = new StringBuilder();
                     try
                     {
+                        // 1トラック分の処理.
                         string trackName = null;
+                        sb.Clear();
                         try
                         {
-                            trackName = track.Name;
+                            trackName = trackBase.Name;
                         }
                         catch (Exception ex)
                         {
                             logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
                         }
-                        if (bgWorker != null)
-                        {
-                            bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, br)));
-                        }
-                        foreach (string fieldName in TrackFieldNames)
-                        {
-                            string fieldValue = RubyAdder.GetField(track, fieldName);
-                            string curRuby = RubyAdder.GetSortField(track, fieldName);
-                            string nextFieldValue = fieldValue;
-                            bool isNeedSetRuby = false;
-                            if (rubyAdder.opeData.ope == RubyAdderOpeType.ZEN2HAN)
-                            {
-                                nextFieldValue = ConvertHelper.ToHankaku(rubyAdder, fieldValue);
-                                if (fieldValue != nextFieldValue)
-                                {
-                                    // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
-                                    RubyAdder.SetField(track, fieldName, nextFieldValue + "_");
-                                    RubyAdder.SetField(track, fieldName, nextFieldValue);
-                                    // フィールドが更新されると、よみがながリセットされてしまうので、変更が無くても設定し直す必要がある.
-                                    isNeedSetRuby = true;
-                                }
-
-                                string nextRuby = curRuby;
-                                {
-                                    nextRuby = ConvertHelper.ToHankaku(rubyAdder, curRuby);
-                                    if (nextRuby == curRuby || !isNeedSetRuby)
-                                    {
-                                        // 変化無し。
-                                    }
-                                    else
-                                    {
-                                        // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
-                                        RubyAdder.SetSortField(track, fieldName, nextRuby + "_");
-                                        RubyAdder.SetSortField(track, fieldName, nextRuby);
-                                    }
-                                }
-                                if (fieldValue != nextFieldValue)
-                                {
-                                    sb.Append("[ ")
-                                        .Append(fieldValue)
-                                        .Append(" ]")
-                                        .Append(" -> ")
-                                        .Append("[ ")
-                                        .Append(nextFieldValue)
-                                        .Append(" ]");
-                                    sb.Append(br);
-                                }
-                                if (fieldValue != nextRuby)
-                                {
-                                    sb.Append("[ ")
-                                        .Append(curRuby)
-                                        .Append(" ]")
-                                        .Append(" -> ")
-                                        .Append("[ ")
-                                        .Append(nextRuby)
-                                        .Append(" ]");
-                                }
-                                sb.Append(br);
-                            }
-                            else
-                            {
-                                string nextRuby = curRuby;
-                                bool isWrite = rubyAdder.opeData.isForceAdd || curRuby.Length <= 0 || rubyAdder.opeData.ope == RubyAdderOpeType.CLEAR;
-                                if (isWrite)
-                                {
-                                    nextRuby = ConvertHelper.MakeSortField(rubyAdder, nextFieldValue);
-                                    if (nextRuby == curRuby)
-                                    {
-                                        // 変化無し。
-                                    }
-                                    else
-                                    {
-                                        RubyAdder.SetSortField(track, fieldName, nextRuby);
-                                        string afterRuby = RubyAdder.GetSortField(track, fieldName);
-                                        if (nextRuby != afterRuby)
-                                        {
-                                            // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
-                                            RubyAdder.SetSortField(track, fieldName, nextRuby + "_");
-                                            RubyAdder.SetSortField(track, fieldName, nextRuby);
-                                        }
-                                    }
-                                }
-                                sb.Append("[ ")
-                                    .Append(fieldValue)
-                                    .Append(" ]")
-                                    .Append(" -> ")
-                                    .Append("[ ")
-                                    .Append(nextRuby)
-                                    .Append(" ]");
-                                if (!isWrite)
-                                {
-                                    sb.Append("(スキップ)");
-                                }
-                                sb.Append(br);
-                            }
-                        }
+                        IITFileOrCDTrack track = trackBase as IITFileOrCDTrack;
+                        if (track == null) continue;
+                        bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, BR)));
+                        ExecTrack(rubyAdder, track, sb);
                     }
                     catch (Exception ex)
                     {
                         // なんかエラー
                         logger.TraceEvent(TraceEventType.Error, 0, "トラックエラー. ex:" + ex.Message);
-                        rubyAdder.exceptionList.Add(ex);
-                        sb.Append("トラックを編集出来ませんでした(スキップ)").Append(br);
+                        exceptionList.Add(ex);
+                        sb.Append("トラックを編集出来ませんでした(スキップ)").Append(BR);
                         errorTrackNum += 1;
                     }
                     finally
@@ -277,18 +168,15 @@ namespace jp.osakana4242.itunes_furikake
                     }
                 }
 
-                if (bgWorker != null)
-                {
-                    string log = br
-                        + "エラートラック数: " + errorTrackNum + br
-                        + "総トラック数: " + endTrackNum + br
-                        ;
-                    bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, log));
-                }
+                string log = BR
+                    + "エラートラック数: " + errorTrackNum + BR
+                    + "総トラック数: " + endTrackNum + BR
+                    ;
+                bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, log));
 
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(250);
 
-                if (0 < rubyAdder.exceptionList.Count)
+                if (0 < exceptionList.Count)
                 {
                     result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
                     result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack2;
@@ -302,64 +190,106 @@ namespace jp.osakana4242.itunes_furikake
             }
         }
 
-        public static string GetField(IITTrack track, string fieldName)
+        /** 処理を適用したペアを得る */
+        public static TrackFieldPair GetProcessedPair(RubyAdder rubyAdder, TrackFieldPair pair)
         {
-            try
+            switch (rubyAdder.opeData.ope)
             {
-                string ret = (string)track.GetType().InvokeMember(fieldName, BindingFlags.GetProperty, null, track, null);
-                if (ret != null)
-                {
-                    return ret;
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new TrackFieldCantGetException(ex);
+                case RubyAdderOpeType.ZEN2HAN:
+                    return UpdateZenToHan(rubyAdder, pair);
+                case RubyAdderOpeType.CLEAR:
+                    return ClearSortField(rubyAdder, pair);
+                default:
+                    return UpdateSortField(rubyAdder, pair);
             }
         }
 
-        public static string GetSortField(IITTrack track, string fieldName)
+
+        public static void SetFieldIfNeeded(RubyAdder rubyAdder, IITFileOrCDTrack track, TrackFieldAccessor accessor, TrackFieldPair before, TrackFieldPair after)
         {
-            try
+            bool isNeedUpdateField = before.field != after.field;
+            // フィールドが更新されると、よみがながリセットされてしまうので、変更が無くても設定し直す必要がある.
+            bool isNeedUpdateSortField = isNeedUpdateField || before.sortField != after.sortField;
+
+            if (isNeedUpdateField)
             {
-                string ret = (string)track.GetType().InvokeMember("Sort" + fieldName, BindingFlags.GetProperty, null, track, null);
-                if (ret != null)
+                if (ConvertHelper.IsNeedSetDummyField(rubyAdder, before.field, after.field))
                 {
-                    return ret;
+                    // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
+                    accessor.setField(track, after.field + "_");
                 }
-                else
-                {
-                    return "";
-                }
+                accessor.setField(track, after.field);
             }
-            catch (Exception ex)
+
+            if (isNeedUpdateSortField)
             {
-                throw new TrackFieldCantGetException(ex);
+                if (ConvertHelper.IsNeedSetDummyField(rubyAdder, before.sortField, after.sortField))
+                {
+                    // 文字種の変更だけでは更新が無かったことにされてしまうので、ダミー文字を挟む.
+                    accessor.setSortField(track, after.sortField + "_");
+                }
+                accessor.setSortField(track, after.sortField);
             }
         }
 
-        /** スレッドセーフではない。
-        */
-        public static void SetSortField(IITTrack track, string fieldName, string value)
+        /** 変化分を sb に追記する.  */
+        public static void AddDiff(RubyAdder rubyAdder, TrackFieldPair before, TrackFieldPair after, System.Text.StringBuilder sb)
         {
-            SetField(track, "Sort" + fieldName, value);
+            if (before.field != after.field)
+            {
+                sb.AppendFormat("[{0}] -> [{1}]", before.field, after.field);
+                sb.Append(BR);
+            }
+            if (before.sortField != after.sortField)
+            {
+                sb.AppendFormat("[{0}]: [{1}] -> [{2}]", after.field, before.sortField, after.sortField);
+                sb.Append(BR);
+            }
         }
 
-        public static void SetField(IITTrack track, string fieldName, string value)
+        /** トラックに対する処理の実行. */
+        public static void ExecTrack(RubyAdder rubyAdder, IITFileOrCDTrack track, System.Text.StringBuilder sb)
         {
-            RubyAdder.tempArg1[0] = value;
-            try
+            foreach (var accessor in TrackFieldAccessor.items)
             {
-                track.GetType().InvokeMember(fieldName, BindingFlags.SetProperty, null, track, RubyAdder.tempArg1);
-            }
-            catch (Exception ex)
-            {
-                throw new TrackFieldCantSetException(ex);
+                var pair = new TrackFieldPair()
+                {
+                    field = accessor.getField(track),
+                    sortField = accessor.getSortField(track),
+                };
+                var pairAfter = GetProcessedPair(rubyAdder, pair);
+                SetFieldIfNeeded(rubyAdder, track, accessor, pair, pairAfter);
+                AddDiff(rubyAdder, pair, pairAfter, sb);
             }
         }
+
+        public static TrackFieldPair ClearSortField(RubyAdder rubyAdder, TrackFieldPair pair)
+        {
+            pair.sortField = "";
+            return pair;
+        }
+
+        public static TrackFieldPair UpdateSortField(RubyAdder rubyAdder, TrackFieldPair pair)
+        {
+            bool isWrite = rubyAdder.opeData.isForceAdd || pair.sortField.Length <= 0;
+            if (!isWrite) return pair;
+
+            pair.sortField = ConvertHelper.MakeSortField(rubyAdder, pair.field);
+            return pair;
+        }
+
+        public static TrackFieldPair UpdateZenToHan(RubyAdder rubyAdder, TrackFieldPair pair)
+        {
+            pair.field = ConvertHelper.ToHankaku(rubyAdder, pair.field);
+            pair.sortField = ConvertHelper.ToHankaku(rubyAdder, pair.sortField);
+            return pair;
+        }
+
+        public struct TrackFieldPair
+        {
+            public string field;
+            public string sortField;
+        }
+
     }
 }

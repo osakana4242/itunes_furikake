@@ -17,7 +17,7 @@ namespace jp.osakana4242.itunes_furikake
         {
             InitializeComponent();
             this.rubyAdder = rubyAdder;
-            this.rubyAdder.setLogger(this.addLog);
+            this.rubyAdder.SetLogger(this.addLog);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -62,7 +62,7 @@ namespace jp.osakana4242.itunes_furikake
             this.Enabled = false;
             rubyAdder.opeData.ope = ope;
             rubyAdder.opeData.isForceAdd = checkBox1.Checked;
-            ProgressDialog progressDialog = new ProgressDialog(this, RubyAdder.doWorkEventHandler, rubyAdder);
+            ProgressDialog progressDialog = new ProgressDialog(this,  RubyAdder.doWorkEventHandler, rubyAdder);
             progressDialog.Text = jp.osakana4242.itunes_furikake.Properties.Resources.StrExecuting;
             progressDialog.Show(this);
 //            this.rubyAdder.Exec(ope);

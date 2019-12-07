@@ -1,4 +1,4 @@
-iTunes‚Ó‚è‚©‚¯‚ðŽÀs‚·‚é‚É‚ÍˆÈ‰º‚ÌƒvƒƒOƒ‰ƒ€‚ðƒCƒ“ƒXƒg[ƒ‹‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
+iTunesãµã‚Šã‹ã‘ã‚’å®Ÿè¡Œã™ã‚‹ã«ã¯ä»¥ä¸‹ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
 * iTunes
 * Microsoft .NET Framework 4 Client Profile
 * Microsoft IME

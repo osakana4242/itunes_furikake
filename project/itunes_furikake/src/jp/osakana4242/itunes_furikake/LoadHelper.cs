@@ -13,7 +13,8 @@ using jp.osakana4242.core.LogOperator;
 
 namespace jp.osakana4242.itunes_furikake
 {
-    public static class LoadHelper {
+    public static class LoadHelper
+    {
 
         public static Dictionary<char, char> ReadDictC(string filename)
         {

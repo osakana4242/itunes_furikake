@@ -1,3 +1,7 @@
-�ꕔ�t�H���_�̐���
-* outside_res - �r���h�� exe �t�@�C���Ɠ��K�w�ɂ��̂܂܂̏�ԂŔz�u���郊�\�[�X
-* cmd - �r���h�̑O�㏈��
+一部フォルダの説明
+* outside_res - ビルド後 exe ファイルと同階層にそのままの状態で配置するリソース
+* cmd - ビルドの前後処理
+
+開発環境
+Visual Studio Community 2017
+

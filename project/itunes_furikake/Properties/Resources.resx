@@ -135,7 +135,7 @@
 バージョン: ${app.version}
 
 作：三途の川おさかな
-Web： http://osakana4242.yokochou.com/</value>
+Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
   <data name="StrErrUnknown" xml:space="preserve">
     <value>不明なエラーが発生しました。</value>

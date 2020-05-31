@@ -19,7 +19,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -93,6 +93,78 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
+        ///   {0}件の中に削除対象のトラックはみつかりませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteCheckLog1 {
+            get {
+                return ResourceManager.GetString("StrDeleteCheckLog1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   リストアップ中 ({0} / {1}) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteCheckProgress1 {
+            get {
+                return ResourceManager.GetString("StrDeleteCheckProgress1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   存在しないトラックの削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteConfirmForm1 {
+            get {
+                return ResourceManager.GetString("StrDeleteConfirmForm1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   下記 {0}件 のトラックをライブラリから削除します。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteConfirmForm2 {
+            get {
+                return ResourceManager.GetString("StrDeleteConfirmForm2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}: [{1}] に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteConfirmForm3 {
+            get {
+                return ResourceManager.GetString("StrDeleteConfirmForm3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}: [{1}] - 削除失敗 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteNG {
+            get {
+                return ResourceManager.GetString("StrDeleteNG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {0}: [{1}] - 削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteOK {
+            get {
+                return ResourceManager.GetString("StrDeleteOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   削除中 ({0} / {1}) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteProgress1 {
+            get {
+                return ResourceManager.GetString("StrDeleteProgress1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   &apos;Microsoft IME&apos;をインストールしてください。
         ///&apos;{0}&apos;のCLSIDが取得できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
@@ -112,7 +184,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   トラックを選択してください。 に類似しているローカライズされた文字列を検索します。
+        ///   iTunesでトラックを選択してください。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrErrTrack1 {
             get {

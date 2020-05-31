@@ -10,9 +10,41 @@ using System.Diagnostics;
 using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
+using System.Diagnostics.Eventing.Reader;
 
 namespace jp.osakana4242.itunes_furikake
 {
+    public struct TrackID
+    {
+        public readonly int highID;
+        public readonly int lowID;
+        public TrackID(int high, int low)
+        {
+            this.highID = high;
+            this.lowID = low;
+        }
+    }
+
+    public static class iTunesAppExt
+    {
+        public static TrackID GetTrackID_ext(this iTunesApp self, object obj)
+        {
+            int highID;
+            int lowID;
+            self.GetITObjectPersistentIDs(ref obj, out highID, out lowID);
+            return new TrackID(highID, lowID);
+        }
+    }
+
+    public static class IITTrackCollectionExt
+    {
+
+        public static IITTrack GetItemByTrackID_ext(this IITTrackCollection self, in TrackID id)
+        {
+            return self.ItemByPersistentID[id.highID, id.lowID];
+        }
+    }
+
     public enum RubyAdderOpeType
     {
         HIRAGANA,
@@ -20,12 +52,21 @@ namespace jp.osakana4242.itunes_furikake
         ALPHABET,
         CLEAR,
         ZEN2HAN,
+        DELETE_UNEXISTS,
     };
 
     public class RubyAdderOpeData
     {
         public RubyAdderOpeType ope;
+        /// <summary>上書きするか</summary>
         public bool isForceAdd;
+        /// <summary>削除時に確認を挟むか</summary>
+        public bool isNeedConfirmation;
+
+        /// <summary>進捗</summary>
+        public int progress;
+        /// <summary>工程数</summary>
+        public int total;
     }
 
     /// <summary>
@@ -89,104 +130,6 @@ namespace jp.osakana4242.itunes_furikake
             {
                 this.imeLanguage.Dispose();
                 this.imeLanguage = null;
-            }
-        }
-
-
-        //BackgroundWorker1のDoWorkイベントハンドラ
-        //ここで時間のかかる処理を行う
-        public static readonly DoWorkEventHandler doWorkEventHandler = (object sender, DoWorkEventArgs e) =>
-        {
-            Exec((BackgroundWorker)sender, e);
-        };
-
-
-        public static void Exec(BackgroundWorker bgWorker, DoWorkEventArgs e)
-        {
-            RubyAdder rubyAdder = (RubyAdder)e.Argument;
-            ProgressResult result = new ProgressResult();
-            try
-            {
-                List<Exception> exceptionList = new List<Exception>();
-
-                if (e != null)
-                {
-                    e.Result = result;
-                }
-                IITTrackCollection tracks = rubyAdder.iTunesApp.SelectedTracks;
-                if (tracks == null)
-                {
-                    result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-                    result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack1;
-                    return;
-                }
-                int endTrackNum = 0;
-                int errorTrackNum = 0;
-                int targetTrackNum = tracks.Count;
-                StringBuilder sb = new StringBuilder();
-                // int targetFieldNum = tracks.Count * TrackFieldNames.Length;
-                foreach (IITTrack trackBase in tracks)
-                {
-                    // 中断.
-                    if (bgWorker.CancellationPending) return;
-                    // 1トラック分の処理.
-                    try
-                    {
-                        // 1トラック分の処理.
-                        string trackName = null;
-                        sb.Clear();
-                        try
-                        {
-                            trackName = trackBase.Name;
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
-                        }
-                        IITFileOrCDTrack track = trackBase as IITFileOrCDTrack;
-                        if (track == null) continue;
-                        bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, BR)));
-                        ExecTrack(rubyAdder, track, sb);
-                    }
-                    catch (Exception ex)
-                    {
-                        // なんかエラー
-                        logger.TraceEvent(TraceEventType.Error, 0, "トラックエラー. ex:" + ex.Message);
-                        exceptionList.Add(ex);
-                        sb.Append("トラックを編集出来ませんでした(スキップ)").Append(BR);
-                        errorTrackNum += 1;
-                    }
-                    finally
-                    {
-                        endTrackNum += 1;
-                        if (bgWorker != null)
-                        {
-                            //ProgressChangedイベントハンドラを呼び出し、
-                            //コントロールの表示を変更する
-                            bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(String.Format("{0}/{1}", endTrackNum, targetTrackNum), sb.ToString()));
-                        }
-                    }
-                }
-
-                string log = BR
-                    + "エラートラック数: " + errorTrackNum + BR
-                    + "総トラック数: " + endTrackNum + BR
-                    ;
-                bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, log));
-
-                System.Threading.Thread.Sleep(250);
-
-                if (0 < exceptionList.Count)
-                {
-                    result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-                    result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack2;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.TraceEvent(TraceEventType.Error, 0, "不昧なエラー. ex:" + ex.Message);
-                result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-                result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrUnknown;
             }
         }
 

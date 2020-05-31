@@ -15,14 +15,17 @@ namespace jp.osakana4242.itunes_furikake
         private object workArg;
         private ProgressResult result;
         private RootForm rootForm;
+        System.Action<ProgressResult> onCompleted;
 
-        public ProgressDialog(RootForm rootForm, DoWorkEventHandler work, object workArg)
+        public ProgressDialog(RootForm rootForm, DoWorkEventHandler work, object workArg, System.Action<ProgressResult> onCompleted)
         {
             InitializeComponent();
             this.backgroundWorker1.DoWork += work;
             this.workArg = workArg;
             this.label1.Text = "";
             this.rootForm = rootForm;
+            this.onCompleted = onCompleted;
+
         }
 
         public void SetProgressParams(string label, int value, int minValue, int maxValue)
@@ -44,17 +47,18 @@ namespace jp.osakana4242.itunes_furikake
             this.progressBar1.Minimum = 0;
             this.progressBar1.Maximum = 100;
             this.progressBar1.Value = e.ProgressPercentage;
-            if (e.UserState != null)
+
+            if (e.UserState == null) return;
+            if (!(e.UserState is ProgressDialogState state)) return;
+
+            if (state.Text != null)
             {
-                ProgressDialogState state = (ProgressDialogState)e.UserState;
-                if (state.Text != null)
-                {
-                    this.label1.Text = state.Text;
-                }
-                if (state.Log != null)
-                {
-                    this.rootForm.addLog(state.Log);
-                }
+                this.label1.Text = state.Text;
+            }
+
+            if (state.Log != null)
+            {
+                this.rootForm.AddLog(state.Log);
             }
         }
 
@@ -81,10 +85,7 @@ namespace jp.osakana4242.itunes_furikake
 
         private void ProgressDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (this.result != null && this.result.message != null)
-            {
-                MessageBox.Show(this.result.message, this.result.title);
-            }
+            onCompleted(this.result);
             this.Owner.Enabled = true;
         }
 
@@ -95,10 +96,10 @@ namespace jp.osakana4242.itunes_furikake
 
     }
 
-    public class ProgressDialogState
+    public sealed class ProgressDialogState
     {
-        public string Text = "";
-        public string Log = "";
+        public readonly string Text = "";
+        public readonly string Log = "";
         public ProgressDialogState(string text, string log)
         {
             this.Text = text;
@@ -106,11 +107,11 @@ namespace jp.osakana4242.itunes_furikake
         }
     }
 
-    public class ProgressResult
+    public sealed class ProgressResult
     {
         public Exception ex;
         public string title;
         public string message;
+        public TrackID[] trackIDList = { };
     }
-
 }

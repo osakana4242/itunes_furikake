@@ -86,7 +86,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\jp\osakana4242\core\LogOperator.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\FlowService.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\Exception.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\OkCancelDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\jp\osakana4242\itunes_furikake\OkCancelDialog.Designer.cs">
+      <DependentUpon>OkCancelDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="src\jp\osakana4242\itunes_furikake\LoadHelper.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\TableFieldAccessor.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdder.cs" />
@@ -120,6 +127,9 @@
       <DependentUpon>ProgressDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="src\jp\osakana4242\itunes_furikake\OkCancelDialog.resx">
+      <DependentUpon>OkCancelDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\jp\osakana4242\itunes_furikake\RootForm.resx">
       <DependentUpon>RootForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
+namespace jp.osakana4242.itunes_furikake
 {
 	public partial class OkCancelDialog : Form
 	{
 		System.Action<Result> onCompleted;
-		Result result;
+		Result result = Result.Cancel;
 
 		public OkCancelDialog(string title, string body, System.Action<Result> onCompleted)
 		{
@@ -42,20 +42,22 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 
 		private void OkCancelDialog_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			var func = this.onCompleted;
-			this.onCompleted = null;
-			func(this.result);
+			FlowService.Delay(Tuple.Create(this.onCompleted, this.result), _prm =>
+			{
+				_prm.Item1(_prm.Item2);
+			});
 		}
 
 		private void OkCancelDialog_Shown(object sender, EventArgs e)
 		{
 			this.Focus();
+			this.okButton.Focus();
 		}
 
 		public enum Result
 		{
-			OK,
 			Cancel,
+			OK,
 		}
 
 	}

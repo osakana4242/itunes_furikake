@@ -40,17 +40,22 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.コマンドToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.全角英数を半角にするToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.存在しないトラックを削除するToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.トラックの削除時に確認をするToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.ヘルプToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.バージョン情報ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.トラックの削除時に確認をするToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.menuStrip1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+			this.splitContainer1.Panel1.SuspendLayout();
+			this.splitContainer1.Panel2.SuspendLayout();
+			this.splitContainer1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// button1
 			// 
-			this.button1.Location = new System.Drawing.Point(12, 27);
+			this.button1.Location = new System.Drawing.Point(7, 7);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(151, 23);
 			this.button1.TabIndex = 0;
@@ -60,7 +65,7 @@
 			// 
 			// button2
 			// 
-			this.button2.Location = new System.Drawing.Point(12, 85);
+			this.button2.Location = new System.Drawing.Point(7, 65);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(151, 23);
 			this.button2.TabIndex = 1;
@@ -70,7 +75,7 @@
 			// 
 			// button3
 			// 
-			this.button3.Location = new System.Drawing.Point(12, 114);
+			this.button3.Location = new System.Drawing.Point(7, 94);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(151, 23);
 			this.button3.TabIndex = 2;
@@ -80,7 +85,7 @@
 			// 
 			// checkBox1
 			// 
-			this.checkBox1.Location = new System.Drawing.Point(186, 27);
+			this.checkBox1.Location = new System.Drawing.Point(181, 7);
 			this.checkBox1.Name = "checkBox1";
 			this.checkBox1.Size = new System.Drawing.Size(111, 23);
 			this.checkBox1.TabIndex = 3;
@@ -91,22 +96,23 @@
 			// 
 			// console
 			// 
-			this.console.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.console.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.console.Font = new System.Drawing.Font("ＭＳ ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.console.HideSelection = false;
-			this.console.Location = new System.Drawing.Point(0, 155);
+			this.console.Location = new System.Drawing.Point(0, 0);
 			this.console.Multiline = true;
 			this.console.Name = "console";
 			this.console.ReadOnly = true;
 			this.console.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.console.Size = new System.Drawing.Size(304, 207);
+			this.console.Size = new System.Drawing.Size(304, 178);
 			this.console.TabIndex = 5;
 			this.console.WordWrap = false;
 			// 
 			// label1
 			// 
+			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(10, 140);
+			this.label1.Location = new System.Drawing.Point(1, 142);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(23, 12);
 			this.label1.TabIndex = 6;
@@ -114,7 +120,7 @@
 			// 
 			// button5
 			// 
-			this.button5.Location = new System.Drawing.Point(12, 56);
+			this.button5.Location = new System.Drawing.Point(7, 36);
 			this.button5.Name = "button5";
 			this.button5.Size = new System.Drawing.Size(151, 23);
 			this.button5.TabIndex = 7;
@@ -151,12 +157,26 @@
 			this.全角英数を半角にするToolStripMenuItem.Text = "全角英数を半角にする";
 			this.全角英数を半角にするToolStripMenuItem.Click += new System.EventHandler(this.全角英数を半角にするToolStripMenuItem_Click);
 			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(211, 6);
+			// 
 			// 存在しないトラックを削除するToolStripMenuItem
 			// 
 			this.存在しないトラックを削除するToolStripMenuItem.Name = "存在しないトラックを削除するToolStripMenuItem";
 			this.存在しないトラックを削除するToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
 			this.存在しないトラックを削除するToolStripMenuItem.Text = "存在しないトラックを削除する";
 			this.存在しないトラックを削除するToolStripMenuItem.Click += new System.EventHandler(this.存在しないトラックを削除するToolStripMenuItem_Click);
+			// 
+			// トラックの削除時に確認をするToolStripMenuItem
+			// 
+			this.トラックの削除時に確認をするToolStripMenuItem.Checked = true;
+			this.トラックの削除時に確認をするToolStripMenuItem.CheckOnClick = true;
+			this.トラックの削除時に確認をするToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.トラックの削除時に確認をするToolStripMenuItem.Name = "トラックの削除時に確認をするToolStripMenuItem";
+			this.トラックの削除時に確認をするToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+			this.トラックの削除時に確認をするToolStripMenuItem.Text = "トラックの削除時に確認をする";
 			// 
 			// ヘルプToolStripMenuItem
 			// 
@@ -173,33 +193,40 @@
 			this.バージョン情報ToolStripMenuItem.Text = "バージョン情報";
 			this.バージョン情報ToolStripMenuItem.Click += new System.EventHandler(this.バージョン情報ToolStripMenuItem_Click);
 			// 
-			// トラックの削除時に確認をするToolStripMenuItem
+			// splitContainer1
 			// 
-			this.トラックの削除時に確認をするToolStripMenuItem.Checked = true;
-			this.トラックの削除時に確認をするToolStripMenuItem.CheckOnClick = true;
-			this.トラックの削除時に確認をするToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.トラックの削除時に確認をするToolStripMenuItem.Name = "トラックの削除時に確認をするToolStripMenuItem";
-			this.トラックの削除時に確認をするToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-			this.トラックの削除時に確認をするToolStripMenuItem.Text = "トラックの削除時に確認をする";
+			this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+			this.splitContainer1.IsSplitterFixed = true;
+			this.splitContainer1.Location = new System.Drawing.Point(0, 24);
+			this.splitContainer1.Name = "splitContainer1";
+			this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
 			// 
-			// toolStripSeparator1
+			// splitContainer1.Panel1
 			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(211, 6);
+			this.splitContainer1.Panel1.Controls.Add(this.label1);
+			this.splitContainer1.Panel1.Controls.Add(this.button1);
+			this.splitContainer1.Panel1.Controls.Add(this.button5);
+			this.splitContainer1.Panel1.Controls.Add(this.button2);
+			this.splitContainer1.Panel1.Controls.Add(this.checkBox1);
+			this.splitContainer1.Panel1.Controls.Add(this.button3);
+			this.splitContainer1.Panel1MinSize = 150;
+			// 
+			// splitContainer1.Panel2
+			// 
+			this.splitContainer1.Panel2.Controls.Add(this.console);
+			this.splitContainer1.Size = new System.Drawing.Size(304, 337);
+			this.splitContainer1.SplitterDistance = 155;
+			this.splitContainer1.TabIndex = 9;
+			this.splitContainer1.TabStop = false;
 			// 
 			// RootForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(304, 362);
-			this.Controls.Add(this.button5);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.console);
-			this.Controls.Add(this.checkBox1);
-			this.Controls.Add(this.button3);
-			this.Controls.Add(this.button2);
-			this.Controls.Add(this.button1);
+			this.ClientSize = new System.Drawing.Size(304, 361);
+			this.Controls.Add(this.splitContainer1);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.MaximizeBox = false;
@@ -209,6 +236,12 @@
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
+			this.splitContainer1.Panel1.ResumeLayout(false);
+			this.splitContainer1.Panel1.PerformLayout();
+			this.splitContainer1.Panel2.ResumeLayout(false);
+			this.splitContainer1.Panel2.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+			this.splitContainer1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -233,6 +266,7 @@
 		private System.Windows.Forms.ToolStripMenuItem 存在しないトラックを削除するToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem トラックの削除時に確認をするToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.SplitContainer splitContainer1;
 	}
 }
 

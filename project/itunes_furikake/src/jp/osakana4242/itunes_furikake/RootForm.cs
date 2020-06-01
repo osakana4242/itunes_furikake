@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using iTunesLib;
 
-using jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake;
+using jp.osakana4242.itunes_furikake;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -95,6 +95,8 @@ namespace jp.osakana4242.itunes_furikake
 			rubyAdder.opeData.ope = ope;
 			rubyAdder.opeData.isForceAdd = checkBox1.Checked;
 			rubyAdder.opeData.isNeedConfirmation = トラックの削除時に確認をするToolStripMenuItem.Checked;
+			rubyAdder.opeData.progress = 0;
+			rubyAdder.opeData.total = 0;
 
 			switch (ope)
 			{

@@ -8,8 +8,9 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Diagnostics;
 using jp.osakana4242.core.LogOperator;
+using System.Threading.Tasks;
 
-namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
+namespace jp.osakana4242.itunes_furikake
 {
 
 	/// <summary>ダイアログ表示して、処理してのいろんな流れ</summary>
@@ -32,6 +33,19 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 					MessageBox.Show(owner, _result1.message, _result1.title);
 				}
 			});
+		}
+
+		static string getTrackNameSafe(IITTrack trackBase)
+		{
+			try
+			{
+				return trackBase.Name;
+			}
+			catch (Exception ex)
+			{
+				logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
+				return "-";
+			}
 		}
 
 		/// <summary>フリガナ処理とプログレスバーの進行</summary>
@@ -62,28 +76,18 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 				// 中断.
 				if (bgWorker.CancellationPending) return;
 				// 1トラック分の処理.
+				string trackNameForDisplay = getTrackNameSafe(trackBase);
 				try
 				{
-					// 1トラック分の処理.
-					string trackName = null;
 					sb.Clear();
-					try
-					{
-						trackName = trackBase.Name;
-					}
-					catch (Exception ex)
-					{
-						logger.TraceEvent(TraceEventType.Error, 0, "トラック名が取得出来ません. ex:" + ex.Message);
-					}
 					if (!(trackBase is IITFileOrCDTrack track)) continue;
-
-					bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, string.Format("{0}:{1}{2}", endTrackNum + 1, trackName == null ? "-" : trackName, BR)));
+					ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, trackNameForDisplay, string.Format("{0}:{1}{2}", endTrackNum + 1, trackNameForDisplay, BR));
 					RubyAdder.ExecTrack(rubyAdder, track, sb);
 				}
 				catch (Exception ex)
 				{
 					// なんかエラー
-					logger.TraceEvent(TraceEventType.Error, 0, "トラックエラー. ex:" + ex.Message);
+					logger.TraceEvent(TraceEventType.Error, 0, $"トラックエラー. トラック名: {trackNameForDisplay}, ex: {ex.Message}");
 					exceptionList.Add(ex);
 					sb.Append("トラックを編集出来ませんでした(スキップ)").Append(BR);
 					errorTrackNum += 1;
@@ -95,7 +99,7 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 					{
 						//ProgressChangedイベントハンドラを呼び出し、
 						//コントロールの表示を変更する
-						bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(String.Format("{0}/{1}", endTrackNum, targetTrackNum), sb.ToString()));
+						ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, null, sb.ToString());
 					}
 				}
 			}
@@ -105,9 +109,9 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 				+ "エラートラック数: " + errorTrackNum + BR
 				+ "総トラック数: " + endTrackNum + BR
 				;
-			bgWorker.ReportProgress(NumberHelper.Percent(endTrackNum, targetTrackNum), new ProgressDialogState(null, log));
+			ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, null, log);
 
-			System.Threading.Thread.Sleep(250);
+			System.Threading.Thread.Sleep(1000);
 
 			if (0 < exceptionList.Count)
 			{
@@ -135,7 +139,6 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 					MessageBox.Show(owner, _result1.message, _result1.title);
 				}
 				if (_result1.trackIDList.Length <= 0) return;
-
 
 				if (opeData.isNeedConfirmation)
 				{
@@ -209,6 +212,7 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 			// リストアップと削除の2工程.
 			opeData.total += tracks.Count * 2;
 			int errorTrackNum = 0;
+			ProgressDialogState.ReportWithTitle(bgWorker, opeData.progress, opeData.total, Properties.Resources.StrDeleteCheckProgress1);
 
 			/// 素直に foreach で Delete すると、
 			/// Delete を実行した数だけ要素がすっとばされてしまう.
@@ -236,7 +240,7 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 			var trackIDList = new List<TrackID>();
 			foreach (IITTrack trackBase in tracks)
 			{
-				string trackName = "?";
+				string trackNameForDisplay = getTrackNameSafe(trackBase);
 				try
 				{
 					if (bgWorker.CancellationPending) return;
@@ -251,13 +255,6 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 					Console.WriteLine($"{ track.Enabled }");
 					var path = track.Location;
 					var exists = System.IO.File.Exists(path);
-					{
-						string n = track.Name;
-						if (string.IsNullOrEmpty(n))
-						{
-							trackName = n;
-						}
-					}
 
 					if (exists)
 					{
@@ -270,17 +267,14 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 				}
 				catch (Exception ex)
 				{
-					logger.TraceEvent(TraceEventType.Error, 0, $"トラックエラー. トラック名: {trackName}, ex: {ex.Message}");
+					logger.TraceEvent(TraceEventType.Error, 0, $"トラックエラー. トラック名: {trackNameForDisplay}, ex: {ex.Message}");
 					exceptionList.Add(ex);
 					errorTrackNum += 1;
 				}
 				finally
 				{
 					++opeData.progress;
-					bgWorker.ReportProgress(
-						NumberHelper.Percent(opeData.progress, opeData.total),
-						new ProgressDialogState(string.Format(Properties.Resources.StrDeleteCheckProgress1, opeData.progress, opeData.total), null)
-						);
+					ProgressDialogState.Report(bgWorker, opeData.progress, opeData.total, trackNameForDisplay, null);
 				}
 			}
 
@@ -288,12 +282,9 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 
 			if (trackIDList.Count <= 0)
 			{
-				bgWorker.ReportProgress(
-					NumberHelper.Percent(opeData.progress, opeData.total),
-					new ProgressDialogState(
-						null,
-						string.Format(Properties.Resources.StrDeleteCheckLog1, tracks.Count) + BR
-					)
+				ProgressDialogState.Report(bgWorker, opeData.progress, opeData.total,
+					null,
+					string.Format(Properties.Resources.StrDeleteCheckLog1, tracks.Count) + BR
 				);
 			}
 
@@ -309,6 +300,7 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 		/// <summary>削除処理とプログレスバーの進行</summary>
 		public static void DeleteTrackWithProgress(RubyAdderOpeData opeData, BackgroundWorker bw, DoWorkEventArgs evtArgs, TrackID[] trackIDList, IITTrackCollection tracks)
 		{
+			ProgressDialogState.ReportWithTitle(bw, opeData.progress, opeData.total, Properties.Resources.StrDeleteProgress1);
 			var result = new ProgressResult();
 			evtArgs.Result = result;
 			var exceptionList = new List<Exception>();
@@ -318,33 +310,33 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 			{
 				if (bw.CancellationPending) return;
 				TrackID trackID = trackIDList[i];
-				string trackName = $"{i + 1}";
+				string trackNameForDisplay = "-";
 				try
 				{
 					IITTrack track = tracks.GetItemByTrackID_ext(trackID);
-					trackName = $"{i + 1}: {track.Name}";
+					trackNameForDisplay = getTrackNameSafe(track);
 					track.Delete();
-					bw.ReportProgress(
-						NumberHelper.Percent(opeData.progress, opeData.total),
-						new ProgressDialogState(null, string.Format(Properties.Resources.StrDeleteOK, i + 1, trackName) + BR)
+					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+						trackNameForDisplay,
+						 string.Format(Properties.Resources.StrDeleteOK, i + 1, trackNameForDisplay) + BR
 					);
 					++endTrackNum;
 				}
 				catch (System.Exception ex)
 				{
 					exceptionList.Add(ex);
-					bw.ReportProgress(
-						NumberHelper.Percent(opeData.progress, opeData.total),
-						new ProgressDialogState(null, string.Format(Properties.Resources.StrDeleteNG, i + 1, trackName) + BR)
+					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+						trackNameForDisplay,
+						string.Format(Properties.Resources.StrDeleteNG, i + 1, trackNameForDisplay) + BR
 					);
 					++errorTrackNum;
 				}
 				finally
 				{
 					++opeData.progress;
-					bw.ReportProgress(
-						NumberHelper.Percent(opeData.progress, opeData.total),
-						new ProgressDialogState(string.Format(Properties.Resources.StrDeleteProgress1, opeData.progress, opeData.total), null)
+					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+						trackNameForDisplay,
+						null
 					);
 				}
 			}
@@ -353,17 +345,14 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 				+ "エラートラック数: " + errorTrackNum + BR
 				+ "削除したトラック数: " + endTrackNum + BR
 				;
-			bw.ReportProgress(
-				NumberHelper.Percent(opeData.progress, opeData.total),
-				new ProgressDialogState(null, log)
-			);
+			ProgressDialogState.Report(bw, opeData.progress, opeData.total, null, log);
 
 			System.Threading.Thread.Sleep(1000);
 
 			if (0 < exceptionList.Count)
 			{
-				result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-				result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack2;
+				result.title = Properties.Resources.StrAppName;
+				result.message = Properties.Resources.StrErrTrack2;
 			}
 		}
 
@@ -377,7 +366,8 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 
 		public static void ShowProgressDialog<T>(RootForm root, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted)
 		{
-			ProgressDialog progressDialog = new ProgressDialog(root, (_sender, _e) =>
+			ProgressDialog progressDialog = null;
+			progressDialog = new ProgressDialog(root, (_sender, _e) =>
 			{
 				try
 				{
@@ -392,9 +382,24 @@ namespace jp.osakana4242.itunes_furikake.src.jp.osakana4242.itunes_furikake
 					_e.Result = result;
 				}
 
-			}, prm, onCompleted);
-			progressDialog.Text = Properties.Resources.StrExecuting;
+			}, prm, _r => {
+//				progressDialog.Dispose();
+				onCompleted(_r);
+			});
 			progressDialog.ShowDialog(root);
+		}
+
+		public static void Delay<T>(T prm, System.Action<T> func)
+		{
+			var t = new System.Windows.Forms.Timer();
+			t.Interval = 200;
+			t.Tick += (_a, _b) =>
+			{
+				t.Dispose();
+				func(prm);
+			};
+			t.Enabled = true;
+			t.Start();
 		}
 	}
 }

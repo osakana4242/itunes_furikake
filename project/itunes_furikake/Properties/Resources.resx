@@ -154,7 +154,7 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>{0}件の中に削除対象のトラックはみつかりませんでした。</value>
   </data>
   <data name="StrDeleteCheckProgress1" xml:space="preserve">
-    <value>リストアップ中 ({0} / {1})</value>
+    <value>検索中</value>
   </data>
   <data name="StrDeleteConfirmForm1" xml:space="preserve">
     <value>存在しないトラックの削除</value>
@@ -172,6 +172,6 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>{0}: [{1}] - 削除</value>
   </data>
   <data name="StrDeleteProgress1" xml:space="preserve">
-    <value>削除中 ({0} / {1})</value>
+    <value>削除中</value>
   </data>
 </root>

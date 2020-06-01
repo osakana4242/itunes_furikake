@@ -16,6 +16,8 @@ namespace jp.osakana4242.itunes_furikake
         private ProgressResult result;
         private RootForm rootForm;
         System.Action<ProgressResult> onCompleted;
+        string titleTextLeft = "";
+        string bodyTextLeft = "";
 
         public ProgressDialog(RootForm rootForm, DoWorkEventHandler work, object workArg, System.Action<ProgressResult> onCompleted)
         {
@@ -26,6 +28,8 @@ namespace jp.osakana4242.itunes_furikake
             this.rootForm = rootForm;
             this.onCompleted = onCompleted;
 
+            this.titleTextLeft = Properties.Resources.StrExecuting;
+            this.Text = this.titleTextLeft;
         }
 
         public void SetProgressParams(string label, int value, int minValue, int maxValue)
@@ -45,15 +49,30 @@ namespace jp.osakana4242.itunes_furikake
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.progressBar1.Minimum = 0;
-            this.progressBar1.Maximum = 100;
-            this.progressBar1.Value = e.ProgressPercentage;
 
-            if (e.UserState == null) return;
-            if (!(e.UserState is ProgressDialogState state)) return;
-
-            if (state.Text != null)
+            if (!(e.UserState is ProgressDialogState state))
             {
-                this.label1.Text = state.Text;
+                this.progressBar1.Maximum = 100;
+                this.progressBar1.Value = e.ProgressPercentage;
+                return;
+            }
+
+            this.progressBar1.Maximum = state.total;
+            this.progressBar1.Value = state.progress;
+
+            if (state.Title != null)
+            {
+                this.titleTextLeft = state.Title;
+            }
+
+			float percentage = (state.progress * 100f / state.total);
+			this.Text = string.Format("{0} - {1:F2}%",this.titleTextLeft, percentage);
+
+            this.label1.Text = string.Format("{0} / {1}", state.progress, state.total);
+			if (state.Text != null)
+            {
+                this.bodyTextLeft = state.Text;
+                this.label2.Text = this.bodyTextLeft;
             }
 
             if (state.Log != null)
@@ -85,8 +104,12 @@ namespace jp.osakana4242.itunes_furikake
 
         private void ProgressDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
-            onCompleted(this.result);
-            this.Owner.Enabled = true;
+            //this.Owner.Enabled = true;
+            //this.onCompleted(this.result);
+            FlowService.Delay(Tuple.Create(this.Owner, this.onCompleted, this.result), _prm => {
+                _prm.Item1.Enabled = true;
+                _prm.Item2(_prm.Item3);
+            });
         }
 
         private void ProgressDialog_Load(object sender, EventArgs e)
@@ -94,16 +117,43 @@ namespace jp.osakana4242.itunes_furikake
 
         }
 
-    }
+		private void label2_Click(object sender, EventArgs e)
+		{
 
-    public sealed class ProgressDialogState
+		}
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+
+		}
+	}
+
+	public sealed class ProgressDialogState
     {
-        public readonly string Text = "";
-        public readonly string Log = "";
-        public ProgressDialogState(string text, string log)
+        public readonly int progress;
+        public readonly int total;
+        public readonly string Title = null;
+        public readonly string Text = null;
+        public readonly string Log = null;
+        public ProgressDialogState(int progress, int total, string title, string text, string log)
         {
+            this.progress = progress;
+            this.total = total;
+            this.Title = title;
             this.Text = text;
             this.Log = log;
+        }
+
+        public static void ReportWithTitle(BackgroundWorker bw, int progress, int total, string title = null)
+        {
+            var self = new ProgressDialogState(progress, total, title, null, null);
+            bw.ReportProgress(progress * 100 / total, self);
+        }
+
+        public static void Report(BackgroundWorker bw, int progress, int total, string text = null, string log = null)
+        {
+            var self = new ProgressDialogState(progress, total, null, text, log);
+            bw.ReportProgress( progress * 100 / total, self);
         }
     }
 

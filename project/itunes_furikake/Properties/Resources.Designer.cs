@@ -102,7 +102,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   リストアップ中 ({0} / {1}) に類似しているローカライズされた文字列を検索します。
+        ///   検索中 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrDeleteCheckProgress1 {
             get {
@@ -156,7 +156,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   削除中 ({0} / {1}) に類似しているローカライズされた文字列を検索します。
+        ///   削除中 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrDeleteProgress1 {
             get {

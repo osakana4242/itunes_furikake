@@ -36,5 +36,10 @@ namespace jp.osakana4242.itunes_furikake
         {
 
         }
-    }
+
+		private void ErrorDialog_Load(object sender, EventArgs e)
+		{
+
+		}
+	}
 }

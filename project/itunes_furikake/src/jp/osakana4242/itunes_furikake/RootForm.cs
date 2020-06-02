@@ -94,7 +94,6 @@ namespace jp.osakana4242.itunes_furikake
 			this.Enabled = false;
 			rubyAdder.opeData.ope = ope;
 			rubyAdder.opeData.isForceAdd = checkBox1.Checked;
-			rubyAdder.opeData.isNeedConfirmation = トラックの削除時に確認をするToolStripMenuItem.Checked;
 			rubyAdder.opeData.progress = 0;
 			rubyAdder.opeData.total = 0;
 
@@ -106,6 +105,24 @@ namespace jp.osakana4242.itunes_furikake
 				default:
 					FlowService.UpdateTrackFlow(this);
 					break;
+			}
+		}
+
+		private void button4_Click_1(object sender, EventArgs e)
+		{
+
+		}
+
+		private void RootForm_Activated(object sender, EventArgs e)
+		{
+			try
+			{
+				var tracks = rubyAdder.iTunesApp.SelectedTracks;
+				int count = tracks?.Count ?? 0;
+				toolStripStatusLabel1.Text = "選択中のトラック数: " + count;
+			}
+			catch (System.Exception)
+			{
 			}
 		}
 	}

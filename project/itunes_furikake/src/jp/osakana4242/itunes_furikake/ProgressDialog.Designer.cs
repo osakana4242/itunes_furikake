@@ -33,6 +33,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
 			this.label2 = new System.Windows.Forms.Label();
+			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// progressBar1
@@ -82,12 +83,26 @@
 			this.label2.Text = "label2";
 			this.label2.Click += new System.EventHandler(this.label2_Click);
 			// 
+			// checkBox1
+			// 
+			this.checkBox1.AutoSize = true;
+			this.checkBox1.Checked = true;
+			this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkBox1.Location = new System.Drawing.Point(12, 92);
+			this.checkBox1.Name = "checkBox1";
+			this.checkBox1.Size = new System.Drawing.Size(154, 16);
+			this.checkBox1.TabIndex = 4;
+			this.checkBox1.Text = "削除前に確認画面をはさむ";
+			this.checkBox1.UseVisualStyleBackColor = true;
+			this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+			// 
 			// ProgressDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(304, 121);
+			this.ClientSize = new System.Drawing.Size(318, 158);
 			this.ControlBox = false;
+			this.Controls.Add(this.checkBox1);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.button1);
@@ -114,5 +129,6 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.CheckBox checkBox1;
 	}
 }

@@ -37,18 +37,18 @@
 			// button1
 			// 
 			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Location = new System.Drawing.Point(217, 246);
+			this.button1.Location = new System.Drawing.Point(217, 229);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(75, 23);
 			this.button1.TabIndex = 0;
-			this.button1.Text = "OK";
+			this.button1.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMessageBoxOK;
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
 			// pictureBox1
 			// 
-			this.pictureBox1.Image = global::jp.osakana4242.itunes_furikake.Properties.Resources.osakana;
-			this.pictureBox1.InitialImage = global::jp.osakana4242.itunes_furikake.Properties.Resources.osakana;
+			this.pictureBox1.Image = global::jp.osakana4242.itunes_furikake.Properties.Resources.ImgOsakana;
+			this.pictureBox1.InitialImage = global::jp.osakana4242.itunes_furikake.Properties.Resources.ImgOsakana;
 			this.pictureBox1.Location = new System.Drawing.Point(12, 113);
 			this.pictureBox1.Name = "pictureBox1";
 			this.pictureBox1.Size = new System.Drawing.Size(120, 120);
@@ -75,13 +75,14 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(304, 281);
-			this.ControlBox = false;
 			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.pictureBox1);
 			this.Controls.Add(this.button1);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-			this.MinimumSize = new System.Drawing.Size(300, 300);
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(320, 320);
 			this.Name = "VersionForm";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "iTunesふりかけのバージョン情報";
 			this.Load += new System.EventHandler(this.VersionForm_Load);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -95,6 +96,5 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TextBox textBox1;
-
-    }
+	}
 }

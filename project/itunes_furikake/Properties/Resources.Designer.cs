@@ -63,9 +63,9 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
-        public static System.Drawing.Bitmap osakana {
+        public static System.Drawing.Bitmap ImgOsakana {
             get {
-                object obj = ResourceManager.GetObject("osakana", resourceCulture);
+                object obj = ResourceManager.GetObject("ImgOsakana", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -111,7 +111,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   存在しないトラックの削除 に類似しているローカライズされた文字列を検索します。
+        ///   実体の無いトラックの削除 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrDeleteConfirmForm1 {
             get {
@@ -161,6 +161,15 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         public static string StrDeleteProgress1 {
             get {
                 return ResourceManager.GetString("StrDeleteProgress1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   削除前にトラックを確認する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrDeleteProgressCheckbox {
+            get {
+                return ResourceManager.GetString("StrDeleteProgressCheckbox", resourceCulture);
             }
         }
         
@@ -216,6 +225,141 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         public static string StrExecuting {
             get {
                 return ResourceManager.GetString("StrExecuting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   その他のコマンド に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommand {
+            get {
+                return ResourceManager.GetString("StrMenuCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   実体の無いトラックの削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandDelete {
+            get {
+                return ResourceManager.GetString("StrMenuCommandDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   読みを降る に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandGroupRuby {
+            get {
+                return ResourceManager.GetString("StrMenuCommandGroupRuby", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ひらがなで読みを降る に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandRubyHiragana {
+            get {
+                return ResourceManager.GetString("StrMenuCommandRubyHiragana", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   カタカナで読みを降る に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandRubyKatakana {
+            get {
+                return ResourceManager.GetString("StrMenuCommandRubyKatakana", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   読みを上書きする に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandRubyOverwrite {
+            get {
+                return ResourceManager.GetString("StrMenuCommandRubyOverwrite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   すでに読みが振られているトラックに対しても、読みを振りなおします。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandRubyOverwriteTooltip {
+            get {
+                return ResourceManager.GetString("StrMenuCommandRubyOverwriteTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ローマ時で読みを降る に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandRubyRome {
+            get {
+                return ResourceManager.GetString("StrMenuCommandRubyRome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   全角英数を半角にする に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuCommandZenkakuToHankaku {
+            get {
+                return ResourceManager.GetString("StrMenuCommandZenkakuToHankaku", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ヘルプ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuHelp {
+            get {
+                return ResourceManager.GetString("StrMenuHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   バージョン情報 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMenuHelpVersion {
+            get {
+                return ResourceManager.GetString("StrMenuHelpVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   キャンセル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMessageBoxCancel {
+            get {
+                return ResourceManager.GetString("StrMessageBoxCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrMessageBoxOK {
+            get {
+                return ResourceManager.GetString("StrMessageBoxOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ログ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrRootFormLog {
+            get {
+                return ResourceManager.GetString("StrRootFormLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   iTunesふりかけのバージョン情報 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrVersionFormTitle {
+            get {
+                return ResourceManager.GetString("StrVersionFormTitle", resourceCulture);
             }
         }
     }

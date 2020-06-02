@@ -121,7 +121,7 @@
     <value>iTunesふりかけ</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="osakana" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="ImgOsakana" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\osakana.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="StrErrTrack1" xml:space="preserve">
@@ -157,7 +157,7 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>検索中</value>
   </data>
   <data name="StrDeleteConfirmForm1" xml:space="preserve">
-    <value>存在しないトラックの削除</value>
+    <value>実体の無いトラックの削除</value>
   </data>
   <data name="StrDeleteConfirmForm2" xml:space="preserve">
     <value>下記 {0}件 のトラックをライブラリから削除します。</value>
@@ -173,5 +173,53 @@ Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
   <data name="StrDeleteProgress1" xml:space="preserve">
     <value>削除中</value>
+  </data>
+  <data name="StrDeleteProgressCheckbox" xml:space="preserve">
+    <value>削除前にトラックを確認する</value>
+  </data>
+  <data name="StrMenuCommand" xml:space="preserve">
+    <value>その他のコマンド</value>
+  </data>
+  <data name="StrMenuCommandDelete" xml:space="preserve">
+    <value>実体の無いトラックの削除</value>
+  </data>
+  <data name="StrMenuCommandGroupRuby" xml:space="preserve">
+    <value>読みを降る</value>
+  </data>
+  <data name="StrMenuCommandRubyHiragana" xml:space="preserve">
+    <value>ひらがなで読みを降る</value>
+  </data>
+  <data name="StrMenuCommandRubyKatakana" xml:space="preserve">
+    <value>カタカナで読みを降る</value>
+  </data>
+  <data name="StrMenuCommandRubyOverwrite" xml:space="preserve">
+    <value>読みを上書きする</value>
+  </data>
+  <data name="StrMenuCommandRubyOverwriteTooltip" xml:space="preserve">
+    <value>すでに読みが振られているトラックに対しても、読みを振りなおします。</value>
+  </data>
+  <data name="StrMenuCommandRubyRome" xml:space="preserve">
+    <value>ローマ時で読みを降る</value>
+  </data>
+  <data name="StrMenuCommandZenkakuToHankaku" xml:space="preserve">
+    <value>全角英数を半角にする</value>
+  </data>
+  <data name="StrMenuHelp" xml:space="preserve">
+    <value>ヘルプ</value>
+  </data>
+  <data name="StrMenuHelpVersion" xml:space="preserve">
+    <value>バージョン情報</value>
+  </data>
+  <data name="StrMessageBoxCancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="StrMessageBoxOK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="StrRootFormLog" xml:space="preserve">
+    <value>ログ</value>
+  </data>
+  <data name="StrVersionFormTitle" xml:space="preserve">
+    <value>iTunesふりかけのバージョン情報</value>
   </data>
 </root>

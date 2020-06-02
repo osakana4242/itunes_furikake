@@ -36,7 +36,7 @@ namespace jp.osakana4242.itunes_furikake
                 typeof(System.Reflection.AssemblyTitleAttribute));
 
 
-            StringBuilder sb = new StringBuilder(global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppInfo);
+            StringBuilder sb = new StringBuilder(Properties.Resources.StrAppInfo);
             sb.Replace("${app.version}", "" + appInfo.Version);
             sb.Replace("${app.displayName}", "" + asmttl.Title);
             this.textBox1.Text = sb.ToString();

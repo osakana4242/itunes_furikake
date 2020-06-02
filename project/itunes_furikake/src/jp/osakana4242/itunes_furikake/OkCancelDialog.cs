@@ -14,12 +14,32 @@ namespace jp.osakana4242.itunes_furikake
 		System.Action<Result> onCompleted;
 		Result result = Result.Cancel;
 
-		public OkCancelDialog(string title, string body, System.Action<Result> onCompleted)
+		public static void ShowOK(IWin32Window owner, string title, string body, System.Action<Result> onCompleted = null)
+		{
+			Show(owner, Type.OK, title, body, onCompleted);
+		}
+
+		public static void ShowOKCancel(IWin32Window owner, string title, string body, System.Action<Result> onCompleted = null)
+		{
+			Show(owner, Type.OKCancel, title, body, onCompleted);
+		}
+
+		public static void Show(IWin32Window owner, Type type, string title, string body, System.Action<Result> onCompleted = null)
+		{
+			using (var self = new OkCancelDialog(type, title, body, onCompleted))
+			{
+				self.ShowDialog(owner);
+			}
+
+		}
+
+		public OkCancelDialog(Type type, string title, string body, System.Action<Result> onCompleted)
 		{
 			InitializeComponent();
-			this.onCompleted = onCompleted;
+			this.onCompleted = onCompleted ?? (_  => { });
 			this.Text = title;
 			this.textBox.Text = body;
+			this.cancelButton.Visible = type == Type.OKCancel;
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -52,6 +72,12 @@ namespace jp.osakana4242.itunes_furikake
 		{
 			this.Focus();
 			this.okButton.Focus();
+		}
+
+		public enum Type
+		{
+			OK,
+			OKCancel,
 		}
 
 		public enum Result

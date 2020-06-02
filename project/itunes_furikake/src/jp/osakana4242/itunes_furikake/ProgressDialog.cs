@@ -19,7 +19,7 @@ namespace jp.osakana4242.itunes_furikake
         string titleTextLeft = "";
         string bodyTextLeft = "";
 
-        public ProgressDialog(RootForm rootForm, DoWorkEventHandler work, object workArg, System.Action<ProgressResult> onCompleted)
+        public ProgressDialog(RootForm rootForm, Config config, DoWorkEventHandler work, object workArg, System.Action<ProgressResult> onCompleted)
         {
             InitializeComponent();
             this.backgroundWorker1.DoWork += work;
@@ -27,6 +27,9 @@ namespace jp.osakana4242.itunes_furikake
             this.label1.Text = "";
             this.rootForm = rootForm;
             this.onCompleted = onCompleted;
+            this.checkBox1.Visible = !string.IsNullOrEmpty( config.checkboxLabel );
+            this.checkBox1.Text = config.checkboxLabel;
+            this.checkBox1.Checked = config.checkboxChecked;
 
             this.titleTextLeft = Properties.Resources.StrExecuting;
             this.Text = this.titleTextLeft;
@@ -84,6 +87,7 @@ namespace jp.osakana4242.itunes_furikake
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.result = (ProgressResult)e.Result;
+            this.result.isNeedConfirm = checkBox1.Checked;
             this.Close();
         }
 
@@ -126,9 +130,20 @@ namespace jp.osakana4242.itunes_furikake
 		{
 
 		}
-	}
 
-	public sealed class ProgressDialogState
+		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		{
+
+		}
+
+        public struct Config
+        {
+            public string checkboxLabel;
+            public bool checkboxChecked;
+        }
+    }
+
+    public sealed class ProgressDialogState
     {
         public readonly int progress;
         public readonly int total;
@@ -162,6 +177,7 @@ namespace jp.osakana4242.itunes_furikake
         public Exception ex;
         public string title;
         public string message;
+        public bool isNeedConfirm;
         public TrackID[] trackIDList = { };
     }
 }

@@ -21,8 +21,8 @@ namespace jp.osakana4242.itunes_furikake
 
 		public static void UpdateTrackFlow(RootForm owner)
 		{
-
-			FlowService.ShowProgressDialog(owner, owner, (_bw, _evtArgs, _owner) =>
+			var config = new ProgressDialog.Config();
+			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _owner) =>
 			{
 				UpdateTrackWithProgress(owner.rubyAdder, _bw, _evtArgs);
 			},
@@ -30,7 +30,7 @@ namespace jp.osakana4242.itunes_furikake
 			{
 				if (_result1 != null && _result1.message != null)
 				{
-					MessageBox.Show(owner, _result1.message, _result1.title);
+					OkCancelDialog.ShowOK(owner, _result1.title, _result1.message);
 				}
 			});
 		}
@@ -128,7 +128,12 @@ namespace jp.osakana4242.itunes_furikake
 		public static void DeleteTrackFlow(RootForm owner, RubyAdderOpeData opeData, iTunesApp iTunesApp)
 		{
 			// プログレスバーを表示して、削除対象をリストアップする
-			FlowService.ShowProgressDialog(owner, owner, (_bw, _evtArgs, _this) =>
+			var config = new ProgressDialog.Config()
+			{
+				checkboxChecked = true,
+				// checkboxLabel = Properties.Resources.StrDeleteProgressCheckbox,
+			};
+			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _this) =>
 			{
 				FlowService.ListupDeleteTrackWithProgress(opeData, _bw, _evtArgs, iTunesApp);
 			},
@@ -136,11 +141,11 @@ namespace jp.osakana4242.itunes_furikake
 			{
 				if (_result1 != null && _result1.message != null)
 				{
-					MessageBox.Show(owner, _result1.message, _result1.title);
+					OkCancelDialog.ShowOK(owner, _result1.title, _result1.message);
 				}
 				if (_result1.trackIDList.Length <= 0) return;
 
-				if (opeData.isNeedConfirmation)
+				if (_result1.isNeedConfirm)
 				{
 					// 確認ダイアログの表示.
 					FlowService.ShowDeleteConfirmDialog(owner, _result1.trackIDList, iTunesApp.SelectedTracks, _result2 =>
@@ -162,7 +167,8 @@ namespace jp.osakana4242.itunes_furikake
 		/// <summary>プログレスバーを表示して削除処理</summary>
 		public static void DeleteTrackAsync(RootForm owner, TrackID[] trackIDList)
 		{
-			FlowService.ShowProgressDialog(owner, owner, (_bw, _evtArgs, _owner) =>
+			var config = new ProgressDialog.Config();
+			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _owner) =>
 			{
 				FlowService.DeleteTrackWithProgress(_owner.rubyAdder.opeData, _bw, _evtArgs, trackIDList, _owner.rubyAdder.iTunesApp.SelectedTracks);
 			}, _r =>
@@ -358,16 +364,16 @@ namespace jp.osakana4242.itunes_furikake
 
 		public static void ShowOkCancelDialog(IWin32Window owner, string title, string body, System.Action<OkCancelDialog.Result> onCompleted)
 		{
-			using (var dialog = new OkCancelDialog(title, body, onCompleted))
+			using (var dialog = new OkCancelDialog(OkCancelDialog.Type.OKCancel, title, body, onCompleted))
 			{
 				dialog.ShowDialog(owner);
 			}
 		}
 
-		public static void ShowProgressDialog<T>(RootForm root, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted)
+		public static void ShowProgressDialog<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted)
 		{
 			ProgressDialog progressDialog = null;
-			progressDialog = new ProgressDialog(root, (_sender, _e) =>
+			progressDialog = new ProgressDialog(root, config, (_sender, _e) =>
 			{
 				try
 				{

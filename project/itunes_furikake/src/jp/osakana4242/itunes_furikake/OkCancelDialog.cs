@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,14 +16,32 @@ namespace jp.osakana4242.itunes_furikake
 		System.Action<Result> onCompleted;
 		Result result = Result.Cancel;
 
-		public static void ShowOK(IWin32Window owner, string title, string body, System.Action<Result> onCompleted = null)
+		public static void ShowOK(IWin32Window owner, string title, string body)
 		{
-			Show(owner, Type.OK, title, body, onCompleted);
+			Show(owner, Type.OK, title, body);
 		}
 
-		public static void ShowOKCancel(IWin32Window owner, string title, string body, System.Action<Result> onCompleted = null)
+		public static IObservable<Result> ShowOKAsync(IWin32Window owner, string title, string body)
 		{
-			Show(owner, Type.OKCancel, title, body, onCompleted);
+			return ShowAsync(owner, Type.OK, title, body);
+		}
+
+		public static IObservable<Result> ShowOKCancelAsync(IWin32Window owner, string title, string body)
+		{
+			return ShowAsync(owner, Type.OKCancel, title, body);
+		}
+
+		public static IObservable<Result> ShowAsync(IWin32Window owner, Type type, string title, string body)
+		{
+			return Observable.Create<Result>(_obs =>
+				{
+					Show(owner, type, title, body, _result =>
+					{
+						_obs.OnNext(_result);
+						_obs.OnCompleted();
+					});
+					return Disposable.Empty;
+				});
 		}
 
 		public static void Show(IWin32Window owner, Type type, string title, string body, System.Action<Result> onCompleted = null)

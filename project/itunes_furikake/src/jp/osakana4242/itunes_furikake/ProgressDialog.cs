@@ -6,6 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Disposables;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -18,6 +21,55 @@ namespace jp.osakana4242.itunes_furikake
         System.Action<ProgressResult> onCompleted;
         string titleTextLeft = "";
         string bodyTextLeft = "";
+
+        public static IObservable<ProgressResult> ShowDialogAsync<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress)
+        {
+            return Observable.Create<ProgressResult>(_obs =>
+            {
+                ShowDialog(root, config, prm, onProgress, _result =>
+                {
+                    _obs.OnNext(_result);
+                    _obs.OnCompleted();
+                }, _ex =>
+                {
+                    _obs.OnError(_ex);
+                });
+
+                return Disposable.Empty;
+            });
+        }
+
+        public static void ShowDialog<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted, System.Action<System.Exception> onError)
+        {
+            ProgressDialog progressDialog = null;
+            System.Exception ex = null;
+            progressDialog = new ProgressDialog(root, config, (_sender, _e) =>
+            {
+                // ここは別スレッド処理.
+                try
+                {
+                    onProgress((BackgroundWorker)_sender, _e, (T)_e.Argument);
+                }
+                catch (Exception ex2)
+                {
+                    // メインスレッドで通知したい.
+                    ex = ex2;
+                }
+
+            }, prm, _r => {
+                if (null != ex)
+                {
+                    onError(ex);
+                    ex = null;
+                }
+                else
+                {
+                    onCompleted(_r);
+                }
+            });
+            progressDialog.ShowDialog(root);
+        }
+
 
         public ProgressDialog(RootForm rootForm, Config config, DoWorkEventHandler work, object workArg, System.Action<ProgressResult> onCompleted)
         {
@@ -175,8 +227,8 @@ namespace jp.osakana4242.itunes_furikake
     public sealed class ProgressResult
     {
         public Exception ex;
-        public string title;
-        public string message;
+        public string errorTitle;
+        public string errorMessage;
         public bool isNeedConfirm;
         public TrackID[] trackIDList = { };
     }

@@ -174,6 +174,36 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
+        ///   ファイルが見つかりません。
+        ///ファイル: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErrFile {
+            get {
+                return ResourceManager.GetString("StrErrFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   エラー に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErrFormTitle {
+            get {
+                return ResourceManager.GetString("StrErrFormTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   不明なエラーが発生しました。
+        ///
+        ///エラーの詳細: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErrFormUnknown {
+            get {
+                return ResourceManager.GetString("StrErrFormUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   &apos;Microsoft IME&apos;をインストールしてください。
         ///&apos;{0}&apos;のCLSIDが取得できません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
@@ -207,15 +237,6 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         public static string StrErrTrack2 {
             get {
                 return ResourceManager.GetString("StrErrTrack2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   不明なエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string StrErrUnknown {
-            get {
-                return ResourceManager.GetString("StrErrUnknown", resourceCulture);
             }
         }
         

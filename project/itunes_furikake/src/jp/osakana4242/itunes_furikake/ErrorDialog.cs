@@ -1,45 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace jp.osakana4242.itunes_furikake
 {
-    /** エラーダイアログ。標準のダイアログって、テキストが選択できないから嫌なので作った。
-    */
-    public partial class ErrorDialog : Form
-    {
-        public ErrorDialog()
-        {
-            InitializeComponent();
-            this.textBox1.Text = "superunko\nunko";
-        }
-
-        public static void Show(String title, String text)
-        {
-            ErrorDialog dlg = new ErrorDialog();
-            dlg.Text = title;
-            dlg.textBox1.Text = text;
-            dlg.ShowDialog();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-		private void ErrorDialog_Load(object sender, EventArgs e)
+	public static class ErrorDialog
+	{
+		public static void Show(IWin32Window owner, string title, string text)
 		{
+			OkCancelDialog.ShowOK(owner, title, text);
+		}
 
+		public static void Show(IWin32Window owner, string message)
+		{
+			Show(owner, Properties.Resources.StrErrFormTitle, message);
+		}
+
+		public static void ShowUnknown(IWin32Window owner, System.Exception ex)
+		{
+			RubyAdder.logger.TraceEvent(TraceEventType.Error, 0, string.Format("不明なエラー. ex: {0}", ex.Message));
+			Show(owner, Properties.Resources.StrErrFormTitle, string.Format(Properties.Resources.StrErrFormUnknown, ex));
 		}
 	}
 }

@@ -137,8 +137,10 @@
 作：三途の川おさかな
 Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
-  <data name="StrErrUnknown" xml:space="preserve">
-    <value>不明なエラーが発生しました。</value>
+  <data name="StrErrFormUnknown" xml:space="preserve">
+    <value>不明なエラーが発生しました。
+
+エラーの詳細: {0}</value>
   </data>
   <data name="StrExecuting" xml:space="preserve">
     <value>処理中</value>
@@ -221,5 +223,12 @@ Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
   <data name="StrVersionFormTitle" xml:space="preserve">
     <value>iTunesふりかけのバージョン情報</value>
+  </data>
+  <data name="StrErrFile" xml:space="preserve">
+    <value>ファイルが見つかりません。
+ファイル: {0}</value>
+  </data>
+  <data name="StrErrFormTitle" xml:space="preserve">
+    <value>エラー</value>
   </data>
 </root>

@@ -7,12 +7,13 @@ using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Disposables;
 using jp.osakana4242.core.LogOperator;
-using System.Threading.Tasks;
 
 namespace jp.osakana4242.itunes_furikake
 {
-
 	/// <summary>ダイアログ表示して、処理してのいろんな流れ</summary>
 	public static class FlowService
 	{
@@ -22,17 +23,20 @@ namespace jp.osakana4242.itunes_furikake
 		public static void UpdateTrackFlow(RootForm owner)
 		{
 			var config = new ProgressDialog.Config();
-			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _owner) =>
-			{
-				UpdateTrackWithProgress(owner.rubyAdder, _bw, _evtArgs);
-			},
-			(_result1) =>
-			{
-				if (_result1 != null && _result1.message != null)
+			ProgressDialog.ShowDialogAsync(owner, config, owner, (_bw, _evtArgs, _owner) =>
 				{
-					OkCancelDialog.ShowOK(owner, _result1.title, _result1.message);
-				}
-			});
+					UpdateTrackWithProgress(owner.rubyAdder, _bw, _evtArgs);
+				}).
+				Subscribe((_result1) =>
+				{
+					if (_result1 != null && _result1.errorMessage != null)
+					{
+						OkCancelDialog.ShowOK(owner, _result1.errorTitle, _result1.errorMessage);
+					}
+				}, _ex =>
+				{
+					ErrorDialog.ShowUnknown(owner, _ex);
+				});
 		}
 
 		static string getTrackNameSafe(IITTrack trackBase)
@@ -61,8 +65,8 @@ namespace jp.osakana4242.itunes_furikake
 			IITTrackCollection tracks = rubyAdder.iTunesApp.SelectedTracks;
 			if (tracks == null)
 			{
-				result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-				result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack1;
+				result.errorTitle = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
+				result.errorMessage = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack1;
 				return;
 			}
 			int endTrackNum = 0;
@@ -115,8 +119,8 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.title = Properties.Resources.StrAppName;
-				result.message = Properties.Resources.StrErrTrack2;
+				result.errorTitle = Properties.Resources.StrAppName;
+				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
 		}
 
@@ -133,51 +137,64 @@ namespace jp.osakana4242.itunes_furikake
 				checkboxChecked = true,
 				// checkboxLabel = Properties.Resources.StrDeleteProgressCheckbox,
 			};
-			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _this) =>
-			{
-				FlowService.ListupDeleteTrackWithProgress(opeData, _bw, _evtArgs, iTunesApp);
-			},
-			_result1 =>
-			{
-				if (_result1 != null && _result1.message != null)
-				{
-					OkCancelDialog.ShowOK(owner, _result1.title, _result1.message);
-				}
-				if (_result1.trackIDList.Length <= 0) return;
 
-				if (_result1.isNeedConfirm)
+			ProgressDialog.ShowDialogAsync(owner, config, owner, (_bw, _evtArgs, _this) =>
 				{
-					// 確認ダイアログの表示.
-					FlowService.ShowDeleteConfirmDialog(owner, _result1.trackIDList, iTunesApp.SelectedTracks, _result2 =>
+					FlowService.ListupDeleteTrackWithProgress(opeData, _bw, _evtArgs, iTunesApp);
+				}).
+				SelectMany(_result1 =>
+				{
+					if (_result1.trackIDList.Length <= 0) throw CancelException.Instance;
+
+					if (_result1.isNeedConfirm)
 					{
-						if (_result2 == OkCancelDialog.Result.Cancel)
-						{
-							return;
-						}
-						DeleteTrackAsync(owner, _result1.trackIDList);
-					});
-				}
-				else
+						// 確認ダイアログあり.
+						return FlowService.ShowDeleteConfirmDialogAsync(owner, _result1.trackIDList, iTunesApp.SelectedTracks).
+						Select(_result2 => Tuple.Create(_result1, _result2));
+					}
+					else
+					{
+						// 確認ダイアログなし.
+						return Observable.Return(Tuple.Create(_result1, OkCancelDialog.Result.OK));
+					}
+				}).
+				SelectMany(_result =>
 				{
-					DeleteTrackAsync(owner, _result1.trackIDList);
-				}
-			});
+					// キャンセル.
+					if (_result.Item2 == OkCancelDialog.Result.Cancel) throw CancelException.Instance;
+					// 実削除処理.
+					return DeleteTrackAsync(owner, _result.Item1.trackIDList);
+				}).
+				Subscribe(_ =>
+				{
+					// 完了.
+				}, _ex =>
+				{
+					if (_ex is CancelException) return; // キャンセルの場合はお咎めなし.
+
+					if (_ex is AppDisplayableException ex)
+					{
+						ErrorDialog.Show(owner, ex.displayMessage);
+					}
+					else
+					{
+						ErrorDialog.ShowUnknown(owner, _ex);
+
+					}
+				});
 		}
 
 		/// <summary>プログレスバーを表示して削除処理</summary>
-		public static void DeleteTrackAsync(RootForm owner, TrackID[] trackIDList)
+		public static IObservable<ProgressResult> DeleteTrackAsync(RootForm owner, TrackID[] trackIDList)
 		{
 			var config = new ProgressDialog.Config();
-			FlowService.ShowProgressDialog(owner, config, owner, (_bw, _evtArgs, _owner) =>
+			return ProgressDialog.ShowDialogAsync(owner, config, owner, (_bw, _evtArgs, _owner) =>
 			{
 				FlowService.DeleteTrackWithProgress(_owner.rubyAdder.opeData, _bw, _evtArgs, trackIDList, _owner.rubyAdder.iTunesApp.SelectedTracks);
-			}, _r =>
-			{
-				// 完了.
 			});
 		}
 
-		public static void ShowDeleteConfirmDialog(IWin32Window owner, TrackID[] trackIDList, IITTrackCollection tracks, System.Action<OkCancelDialog.Result> onCompleted)
+		public static IObservable<OkCancelDialog.Result> ShowDeleteConfirmDialogAsync(IWin32Window owner, TrackID[] trackIDList, IITTrackCollection tracks)
 		{
 			string title = Properties.Resources.StrDeleteConfirmForm1;
 			string body;
@@ -197,7 +214,7 @@ namespace jp.osakana4242.itunes_furikake
 				body = sb.ToString();
 
 			}
-			FlowService.ShowOkCancelDialog(owner, title, body, onCompleted);
+			return OkCancelDialog.ShowOKCancelAsync(owner, title, body);
 		}
 
 		/// <summary>削除対象のトラックをリストアップ, プログレスバーの進行</summary>
@@ -207,12 +224,7 @@ namespace jp.osakana4242.itunes_furikake
 			evtArgs.Result = result;
 			var exceptionList = new List<Exception>();
 			IITTrackCollection tracks = iTunesApp.SelectedTracks;
-			if (tracks == null)
-			{
-				result.title = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
-				result.message = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack1;
-				return;
-			}
+			if (tracks == null) throw new AppDisplayableException(Properties.Resources.StrErrTrack1);
 
 			// 工程数を求める.
 			// リストアップと削除の2工程.
@@ -298,8 +310,8 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.title = Properties.Resources.StrAppName;
-				result.message = Properties.Resources.StrErrTrack2;
+				result.errorTitle = Properties.Resources.StrAppName;
+				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
 		}
 
@@ -357,42 +369,9 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.title = Properties.Resources.StrAppName;
-				result.message = Properties.Resources.StrErrTrack2;
+				result.errorTitle = Properties.Resources.StrAppName;
+				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
-		}
-
-		public static void ShowOkCancelDialog(IWin32Window owner, string title, string body, System.Action<OkCancelDialog.Result> onCompleted)
-		{
-			using (var dialog = new OkCancelDialog(OkCancelDialog.Type.OKCancel, title, body, onCompleted))
-			{
-				dialog.ShowDialog(owner);
-			}
-		}
-
-		public static void ShowProgressDialog<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted)
-		{
-			ProgressDialog progressDialog = null;
-			progressDialog = new ProgressDialog(root, config, (_sender, _e) =>
-			{
-				try
-				{
-					onProgress((BackgroundWorker)_sender, _e, (T)_e.Argument);
-				}
-				catch (Exception ex)
-				{
-					RubyAdder.logger.TraceEvent(TraceEventType.Error, 0, "不昧なエラー. ex:" + ex.Message);
-					var result = new ProgressResult();
-					result.title = Properties.Resources.StrAppName;
-					result.message = Properties.Resources.StrErrUnknown;
-					_e.Result = result;
-				}
-
-			}, prm, _r => {
-//				progressDialog.Dispose();
-				onCompleted(_r);
-			});
-			progressDialog.ShowDialog(root);
 		}
 
 		public static void Delay<T>(T prm, System.Action<T> func)
@@ -407,5 +386,18 @@ namespace jp.osakana4242.itunes_furikake
 			t.Enabled = true;
 			t.Start();
 		}
+	}
+
+	public static class ObservableHelper
+	{
+		public static IObservable<Unit> ReturnUnit<T>()
+		{
+			return Observable.Return(Unit.Default);
+		}
+	}
+
+	public class CancelException : System.Exception
+	{
+		public static readonly CancelException Instance = new CancelException();
 	}
 }

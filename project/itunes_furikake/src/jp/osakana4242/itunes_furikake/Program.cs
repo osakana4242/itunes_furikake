@@ -32,7 +32,7 @@ namespace jp.osakana4242.itunes_furikake
             {
                 //ミューテックスの初期所有権が付与されなかったときは
                 //すでに起動していると判断して終了
-                ErrorDialog.Show("エラー", "多重起動は出来ません。");
+                ErrorDialog.Show(null, "多重起動は出来ません。");
                 return;
             }
             try
@@ -51,23 +51,15 @@ namespace jp.osakana4242.itunes_furikake
                 }
                 catch (AppDisplayableException ex)
                 {
-                    ErrorDialog.Show("エラー",
-                        ex.displayMessage
-                    );
+                    ErrorDialog.Show(null, ex.displayMessage);
                 }
                 catch (FileNotFoundException ex)
                 {
-                    var BR = System.Environment.NewLine;
-                    ErrorDialog.Show("エラー",
-                        ex.FileName + " が見つかりません。"
-                    );
+                    ErrorDialog.Show(null, string.Format(Properties.Resources.StrErrFile, ex.FileName));
                 }
                 catch (Exception ex)
                 {
-                    var BR = System.Environment.NewLine;
-                    ErrorDialog.Show("エラー",
-                        ex.ToString()
-                    );
+                    ErrorDialog.ShowUnknown(null, ex);
                 }
                 finally
                 {

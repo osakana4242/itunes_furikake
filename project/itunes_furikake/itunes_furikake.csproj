@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\jp\osakana4242\core\LogOperator.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\iTunesAppUtil.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\ErrorDialog.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\FlowService.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\Exception.cs" />
@@ -113,6 +114,9 @@
       <DependentUpon>OkCancelDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="src\jp\osakana4242\itunes_furikake\LoadHelper.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdderOpeData.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdderOpeType.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\TableFieldPair.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\TableFieldAccessor.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdder.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\NumberHelper.cs" />

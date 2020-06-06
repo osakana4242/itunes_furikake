@@ -1,74 +1,13 @@
-﻿using System;
-using System.IO;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using System.Reflection;
-using System.Text;
-using System.ComponentModel;
 using System.Diagnostics;
 using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
-using System.Diagnostics.Eventing.Reader;
 
 namespace jp.osakana4242.itunes_furikake
 {
-    public struct TrackID
-    {
-        public readonly int highID;
-        public readonly int lowID;
-        public TrackID(int high, int low)
-        {
-            this.highID = high;
-            this.lowID = low;
-        }
-    }
-
-    public static class iTunesAppExt
-    {
-        public static TrackID GetTrackID_ext(this iTunesApp self, object obj)
-        {
-            int highID;
-            int lowID;
-            self.GetITObjectPersistentIDs(ref obj, out highID, out lowID);
-            return new TrackID(highID, lowID);
-        }
-    }
-
-    public static class IITTrackCollectionExt
-    {
-
-        public static IITTrack GetItemByTrackID_ext(this IITTrackCollection self, in TrackID id)
-        {
-            return self.ItemByPersistentID[id.highID, id.lowID];
-        }
-    }
-
-    public enum RubyAdderOpeType
-    {
-        HIRAGANA,
-        KATAKANA,
-        ALPHABET,
-        CLEAR,
-        ZEN2HAN,
-        DELETE_UNEXISTS,
-    };
-
-    public class RubyAdderOpeData
-    {
-        public RubyAdderOpeType ope;
-        /// <summary>上書きするか</summary>
-        public bool isForceAdd;
-        /// <summary>削除時に確認を挟むか</summary>
-        public bool isNeedConfirmation;
-
-        /// <summary>進捗</summary>
-        public int progress;
-        /// <summary>工程数</summary>
-        public int total;
-    }
-
+ 
     /// <summary>
     /// ルビを振る機能を提供.
     /// </summary>
@@ -227,12 +166,5 @@ namespace jp.osakana4242.itunes_furikake
             pair.sortField = ConvertHelper.ToHankaku(rubyAdder, pair.sortField);
             return pair;
         }
-
-        public struct TrackFieldPair
-        {
-            public string field;
-            public string sortField;
-        }
-
     }
 }

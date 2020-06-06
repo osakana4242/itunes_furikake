@@ -37,20 +37,4 @@ namespace jp.osakana4242.itunes_furikake
         }
 
     }
-
-    public class TrackFieldCantGetException : Exception
-    {
-        public TrackFieldCantGetException(Exception ex)
-            : base("TrackFieldCantGetException", ex)
-        {
-        }
-    }
-
-    public class TrackFieldCantSetException : Exception
-    {
-        public TrackFieldCantSetException(Exception ex)
-            : base("TrackFieldCantSetException", ex)
-        {
-        }
-    }
 }

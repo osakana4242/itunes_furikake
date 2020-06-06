@@ -111,22 +111,6 @@ namespace jp.osakana4242.itunes_furikake
 			}
 		}
 
-		private void button4_Click_1(object sender, EventArgs e)
-		{
-
-		}
-
-		private void RootForm_Activated(object sender, EventArgs e)
-		{
-		}
-
-		private void RootForm_Shown(object sender, EventArgs e)
-		{
-			this.button1.Focus();
-			UpdateComponentStatus();
-			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
-		}
-
 		/// <summary>トラックの選択状態に応じて、各種コンポーネントの表示を切り替える.</summary>
 		void UpdateComponentStatus()
 		{
@@ -153,6 +137,22 @@ namespace jp.osakana4242.itunes_furikake
 			this.button5.Enabled = hasSelectedTrack;
 			this.全角英数を半角にするToolStripMenuItem.Enabled = hasSelectedTrack;
 			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
+		}
+
+		private void button4_Click_1(object sender, EventArgs e)
+		{
+
+		}
+
+		private void RootForm_Activated(object sender, EventArgs e)
+		{
+		}
+
+		private void RootForm_Shown(object sender, EventArgs e)
+		{
+			this.button1.Focus();
+			UpdateComponentStatus();
+			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
 
 		private void timer1_Tick(object sender, EventArgs e)

@@ -47,6 +47,7 @@
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -60,7 +61,7 @@
 			// 
 			this.button1.Location = new System.Drawing.Point(12, 47);
 			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(191, 23);
+			this.button1.Size = new System.Drawing.Size(150, 23);
 			this.button1.TabIndex = 0;
 			this.button1.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyHiragana;
 			this.button1.UseVisualStyleBackColor = true;
@@ -70,7 +71,7 @@
 			// 
 			this.button2.Location = new System.Drawing.Point(12, 105);
 			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(191, 23);
+			this.button2.Size = new System.Drawing.Size(150, 23);
 			this.button2.TabIndex = 1;
 			this.button2.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyRome;
 			this.button2.UseVisualStyleBackColor = true;
@@ -80,7 +81,7 @@
 			// 
 			this.button3.Location = new System.Drawing.Point(24, 170);
 			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(191, 23);
+			this.button3.Size = new System.Drawing.Size(150, 23);
 			this.button3.TabIndex = 2;
 			this.button3.Text = "読みを消す";
 			this.button3.UseVisualStyleBackColor = true;
@@ -99,7 +100,9 @@
 			// 
 			// console
 			// 
-			this.console.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.console.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.console.Font = new System.Drawing.Font("ＭＳ ゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
 			this.console.HideSelection = false;
 			this.console.Location = new System.Drawing.Point(0, 0);
@@ -107,7 +110,7 @@
 			this.console.Name = "console";
 			this.console.ReadOnly = true;
 			this.console.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.console.Size = new System.Drawing.Size(304, 173);
+			this.console.Size = new System.Drawing.Size(304, 148);
 			this.console.TabIndex = 5;
 			this.console.WordWrap = false;
 			// 
@@ -125,7 +128,7 @@
 			// 
 			this.button5.Location = new System.Drawing.Point(12, 76);
 			this.button5.Name = "button5";
-			this.button5.Size = new System.Drawing.Size(191, 23);
+			this.button5.Size = new System.Drawing.Size(150, 23);
 			this.button5.TabIndex = 7;
 			this.button5.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyKatakana;
 			this.button5.UseVisualStyleBackColor = true;
@@ -213,7 +216,7 @@
 			this.groupBox1.Controls.Add(this.button1);
 			this.groupBox1.Location = new System.Drawing.Point(12, 21);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(212, 143);
+			this.groupBox1.Size = new System.Drawing.Size(171, 143);
 			this.groupBox1.TabIndex = 10;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "読みを降る";
@@ -231,8 +234,12 @@
 			// toolStripStatusLabel1
 			// 
 			this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-			this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
-			this.toolStripStatusLabel1.Text = "";
+			this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+			// 
+			// timer1
+			// 
+			this.timer1.Interval = 1000;
+			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
 			// RootForm
 			// 
@@ -248,6 +255,8 @@
 			this.Text = "iTunesふりかけ";
 			this.Activated += new System.EventHandler(this.RootForm_Activated);
 			this.Load += new System.EventHandler(this.Form1_Load);
+			this.Shown += new System.EventHandler(this.RootForm_Shown);
+			this.SizeChanged += new System.EventHandler(this.RootForm_SizeChanged);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.splitContainer1.Panel1.ResumeLayout(false);
@@ -285,6 +294,7 @@
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+		private System.Windows.Forms.Timer timer1;
 	}
 }
 

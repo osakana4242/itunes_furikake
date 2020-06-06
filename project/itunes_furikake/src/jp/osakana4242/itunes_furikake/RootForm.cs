@@ -10,12 +10,15 @@ using System.Diagnostics;
 using iTunesLib;
 
 using jp.osakana4242.itunes_furikake;
+using System.Reactive.Linq;
+using jp.osakana4242.core.LogOperator;
 
 namespace jp.osakana4242.itunes_furikake
 {
 	public partial class RootForm : Form
 	{
 		public RubyAdder rubyAdder;
+
 		public RootForm(RubyAdder rubyAdder)
 		{
 			InitializeComponent();
@@ -115,15 +118,52 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void RootForm_Activated(object sender, EventArgs e)
 		{
+		}
+
+		private void RootForm_Shown(object sender, EventArgs e)
+		{
+			this.button1.Focus();
+			UpdateComponentStatus();
+			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
+		}
+
+		/// <summary>トラックの選択状態に応じて、各種コンポーネントの表示を切り替える.</summary>
+		void UpdateComponentStatus()
+		{
+			int selectedTracksCount = 0;
 			try
 			{
-				var tracks = rubyAdder.iTunesApp.SelectedTracks;
-				int count = tracks?.Count ?? 0;
-				toolStripStatusLabel1.Text = "選択中のトラック数: " + count;
+				var iTunesApp = rubyAdder.iTunesApp;
+				var tracks = iTunesApp.SelectedTracks;
+				selectedTracksCount = tracks?.Count ?? 0;
 			}
-			catch (System.Exception)
+			catch (System.Exception ex)
 			{
+				Console.WriteLine($"ex: {ex}");
 			}
+
+			var hasSelectedTrack = 0 < selectedTracksCount;
+			this.toolStripStatusLabel1.Text = hasSelectedTrack ?
+				string.Format(Properties.Resources.StrRootFormStatusBar1, selectedTracksCount) :
+				Properties.Resources.StrRootFormStatusBar2;
+
+			this.button1.Enabled = hasSelectedTrack;
+			this.button2.Enabled = hasSelectedTrack;
+			this.button3.Enabled = hasSelectedTrack;
+			this.button5.Enabled = hasSelectedTrack;
+			this.全角英数を半角にするToolStripMenuItem.Enabled = hasSelectedTrack;
+			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
+		}
+
+		private void timer1_Tick(object sender, EventArgs e)
+		{
+			UpdateComponentStatus();
+		}
+
+		private void RootForm_SizeChanged(object sender, EventArgs e)
+		{
+			UpdateComponentStatus();
+			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
 	}
 }

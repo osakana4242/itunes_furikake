@@ -376,6 +376,24 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
+        ///   選択中のトラック数: {0} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrRootFormStatusBar1 {
+            get {
+                return ResourceManager.GetString("StrRootFormStatusBar1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   処理したいトラックを iTunes で選択してください。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrRootFormStatusBar2 {
+            get {
+                return ResourceManager.GetString("StrRootFormStatusBar2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   iTunesふりかけのバージョン情報 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrVersionFormTitle {

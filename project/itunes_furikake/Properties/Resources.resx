@@ -231,4 +231,10 @@ Web： https://osakana4242.sakura.ne.jp/</value>
   <data name="StrErrFormTitle" xml:space="preserve">
     <value>エラー</value>
   </data>
+  <data name="StrRootFormStatusBar1" xml:space="preserve">
+    <value>選択中のトラック数: {0}</value>
+  </data>
+  <data name="StrRootFormStatusBar2" xml:space="preserve">
+    <value>処理したいトラックを iTunes で選択してください。</value>
+  </data>
 </root>

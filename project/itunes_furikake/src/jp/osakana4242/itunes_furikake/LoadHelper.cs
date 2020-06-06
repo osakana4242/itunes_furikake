@@ -53,7 +53,7 @@ namespace jp.osakana4242.itunes_furikake
                         // 不正な行。
                         if (cols.Length == 1)
                         {
-                            throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "タブが不足しています。"));
+                            throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "TABが不足しています。TABで区切ってください。"));
                         }
                         continue;
                     }
@@ -61,7 +61,7 @@ namespace jp.osakana4242.itunes_furikake
                     string value = cols[1];
                     if (dict.ContainsKey(key))
                     {
-                        throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, "[ " + key + " ]が重複しています。"));
+                        throw new AppDisplayableException(makeReadDictErrorMessage(filename, lineCnt, line, string.Format("[{0}]が重複しています。", key)));
                     }
                     else
                     {
@@ -74,7 +74,9 @@ namespace jp.osakana4242.itunes_furikake
 
         public static string makeReadDictErrorMessage(string fileName, int lineCnt, string line, string message)
         {
-            return (message + "場所: " + fileName + " - " + lineCnt + "行目 - " + line);
-        }
-    }
+			var path = System.IO.Path.GetFullPath(fileName);
+			return message + "\r\n" +
+				string.Format("該当場所: {0} - {1}行目 - {2}", path, lineCnt, line);
+		}
+	}
 }

@@ -190,7 +190,7 @@ namespace jp.osakana4242.itunes_furikake
 			var config = new ProgressDialog.Config();
 			return ProgressDialog.ShowDialogAsync(owner, config, owner, (_bw, _evtArgs, _owner) =>
 			{
-				FlowService.DeleteTrackWithProgress(_owner.rubyAdder.opeData, _bw, _evtArgs, trackIDList, _owner.rubyAdder.iTunesApp.SelectedTracks);
+				FlowService.DeleteTrackWithProgress(_owner.rubyAdder.opeData, _bw, _evtArgs, _owner.rubyAdder.iTunesApp, trackIDList);
 			});
 		}
 
@@ -316,7 +316,7 @@ namespace jp.osakana4242.itunes_furikake
 		}
 
 		/// <summary>削除処理とプログレスバーの進行</summary>
-		public static void DeleteTrackWithProgress(RubyAdderOpeData opeData, BackgroundWorker bw, DoWorkEventArgs evtArgs, TrackID[] trackIDList, IITTrackCollection tracks)
+		public static void DeleteTrackWithProgress(RubyAdderOpeData opeData, BackgroundWorker bw, DoWorkEventArgs evtArgs, iTunesApp iTunesApp, TrackID[] trackIDList)
 		{
 			ProgressDialogState.ReportWithTitle(bw, opeData.progress, opeData.total, Properties.Resources.StrDeleteProgress1);
 			var result = new ProgressResult();
@@ -324,6 +324,9 @@ namespace jp.osakana4242.itunes_furikake
 			var exceptionList = new List<Exception>();
 			int errorTrackNum = 0;
 			int endTrackNum = 0;
+			// プレイリスト経由で iTunesApp.SelectedTracks から削除すると、プレイリストからしか削除されない.
+			// iTunesApp.LibraryPlaylist.Tracks からなら、確実にライブラリから削除できる.
+			IITTrackCollection tracks = iTunesApp.LibraryPlaylist.Tracks;
 			for (int i = 0, iCount = trackIDList.Length; i < iCount; ++i)
 			{
 				if (bw.CancellationPending) return;

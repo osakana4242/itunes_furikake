@@ -19,11 +19,17 @@ namespace jp.osakana4242.itunes_furikake
 	{
 		public RubyAdder rubyAdder;
 
-		public RootForm(RubyAdder rubyAdder)
+		public RootForm()
 		{
 			InitializeComponent();
-			this.rubyAdder = rubyAdder;
+			this.rubyAdder = new RubyAdder();
+			this.rubyAdder.Init();
 			this.rubyAdder.SetLogger(this.AddLog);
+
+			this.OnDestroyedAsObservableExt().Subscribe(_ =>
+			{
+				this.rubyAdder.Dispose();
+			});
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -123,7 +129,8 @@ namespace jp.osakana4242.itunes_furikake
 			}
 			catch (System.Exception ex)
 			{
-				Console.WriteLine($"ex: {ex}");
+				throw new AppDisplayableException("iTunes への接続に失敗しました");
+//				Console.WriteLine($"ex: {ex}");
 			}
 
 			var hasSelectedTrack = 0 < selectedTracksCount;

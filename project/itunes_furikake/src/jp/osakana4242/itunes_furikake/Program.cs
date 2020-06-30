@@ -1,22 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using System.Reflection;
-using System.Text;
-using System.ComponentModel;
+﻿using jp.osakana4242.core.LogOperator;
+using jp.osakana4242.itunes_furikake.Properties;
+using System;
 using System.Diagnostics;
-using iTunesLib;
-
-using jp.osakana4242.core.LogOperator;
+using System.IO;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace jp.osakana4242.itunes_furikake
 {
     static class Program
     {
 
-        private static TraceSource logger = LogOperator.get();
+        static TraceSource logger = LogOperator.get();
 
 
         /// <summary>
@@ -25,60 +24,127 @@ namespace jp.osakana4242.itunes_furikake
         [STAThread]
         static void Main()
         {
-            bool createdNew;
-            //Mutexクラスの作成
-            System.Threading.Mutex mutex = new System.Threading.Mutex(true, "jp.osakana4242.itunes_furikake", out createdNew);
-            if (createdNew == false)
+            Mutex mutex = null;
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            FormsTimerScheduler.Init();
+
+            Observable.Return(0).
+            ObserveOn(FormsTimerScheduler.Instance).
+            Do(_ =>
             {
-                //ミューテックスの初期所有権が付与されなかったときは
-                //すでに起動していると判断して終了
-                ErrorDialog.Show(null, "多重起動は出来ません。");
-                return;
-            }
+                // 多重起動確認.
+                mutex = new System.Threading.Mutex(true, "jp.osakana4242.itunes_furikake", out bool createdNew);
+			    if (createdNew == false)
+                {
+                    mutex.Dispose();
+                    mutex = null;
+                    throw new AppDisplayableException(Resources.StrErrAppDuplicate);
+                }
+            }).
+            SelectMany(_ =>
+            {
+                // 起動準備.
+                // 進捗を表示する.
+                ProgressDialog.Config config = new ProgressDialog.Config();
+
+
+                return ProgressDialog.ShowDialogAsync(null, config, 0, (_bw, _evtArgs, _prm) =>
+                {
+                    var progress = 0;
+                    var progressTotal = 2;
+                    ProgressDialogState.ReportWithTitle(_bw, progress, progressTotal, Resources.StrStartupFormTitle);
+                    ProgressDialogState.Report(_bw, progress, progressTotal, "");
+                    ProgressResult result = new ProgressResult();
+                    _evtArgs.Result = result;
+                    bool isEndStream = false;
+                    var stream = Observable.Return(0).
+                    Do(_2 =>
+                    {
+                        CleanFiles();
+                        logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake init.");
+                        ++progress;
+                        ProgressDialogState.Report(_bw, progress, progressTotal);
+                    }).
+                    ObserveOn(FormsTimerScheduler.Instance).
+                    Select(_2 =>
+                    {
+                        var form = new RootForm();
+                        ++progress;
+                        ProgressDialogState.Report(_bw, progress, progressTotal);
+                        return form;
+                    }).
+                    Delay(System.TimeSpan.FromSeconds(0.5f), FormsTimerScheduler.Instance).
+                    Finally(() =>
+                    {
+                        isEndStream = true;
+                    });
+
+                    var disposer = stream.Subscribe(_result =>
+                    {
+                        result.result = _result;
+                    });
+
+                    while (!isEndStream)
+                    {
+                        if (_bw.CancellationPending)
+                        {
+                            disposer.Dispose();
+                            return;
+                        }
+                    }
+                });
+            }).
+            Select(_result => (RootForm)_result.result).
+            SelectMany(_form =>
+            {
+                _form.Show();
+                return _form.OnDestroyedAsObservableExt().
+                Select(_ => Unit.Default).
+                Take(1);
+            }).Catch((System.Exception _ex) =>
+            {
+                ShowException(_ex);
+                return Observable.Return(Unit.Default);
+            }).
+            Finally(() =>
+            {
+                Application.Exit();
+                if (null == mutex) return;
+
+                logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake exit.");
+                logger.Close();
+                mutex.ReleaseMutex();
+                mutex.Dispose();
+            }).
+            Subscribe();
+
             try
             {
-                cleanFiles();
-
-                logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake init.");
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                RubyAdder rubyAdder = new RubyAdder();
-                try
-                {
-                    rubyAdder.Init();
-                    RootForm form = new RootForm(rubyAdder);
-                    Application.Run(form);
-                }
-                catch (AppDisplayableException ex)
-                {
-                    ErrorDialog.Show(null, ex.displayMessage);
-                }
-                catch (FileNotFoundException ex)
-                {
-                    ErrorDialog.Show(null, string.Format(Properties.Resources.StrErrFile, ex.FileName));
-                }
-                catch (Exception ex)
-                {
-                    ErrorDialog.ShowUnknown(null, ex);
-                }
-                finally
-                {
-                    rubyAdder.Exit();
-                    logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake exit.");
-                    logger.Close();
-                }
-            }
-            finally
+                Application.Run();
+            } catch (System.Exception ex)
             {
-                //ミューテックスを解放する
-                mutex.ReleaseMutex();
+                ShowException(ex);
             }
         }
 
-        /// <summary>
-        /// 掃除.
-        /// </summary>
-        private static void cleanFiles()
+        static void ShowException(System.Exception ex)
+        {
+            if (ex is AppDisplayableException ex1)
+            {
+                ErrorDialog.Show(null, ex1.displayMessage);
+            }
+            else if (ex is FileNotFoundException ex2)
+            {
+                ErrorDialog.ShowUnknown(null, ex2);
+            }
+            else
+            {
+                ErrorDialog.ShowUnknown(null, ex);
+            }
+        }
+
+        static void CleanFiles()
         {
             // テキストログの削除.
             string dirPath = "log";

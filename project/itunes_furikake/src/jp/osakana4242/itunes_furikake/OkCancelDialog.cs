@@ -1,4 +1,5 @@
-﻿using System;
+﻿using jp.osakana4242.itunes_furikake.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -57,7 +58,9 @@ namespace jp.osakana4242.itunes_furikake
 		{
 			InitializeComponent();
 			this.onCompleted = onCompleted ?? (_  => { });
-			this.Text = title;
+			this.Text = string.IsNullOrEmpty(title) ?
+				Resources.StrAppName :
+				string.Format("{0} - {1}", Resources.StrAppName, title);
 			this.textBox.Text = body;
 			this.cancelButton.Visible = type == Type.OKCancel;
 		}

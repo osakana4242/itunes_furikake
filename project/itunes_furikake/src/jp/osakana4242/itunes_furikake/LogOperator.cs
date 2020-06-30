@@ -9,7 +9,7 @@ using System.Security;
 
 namespace jp.osakana4242.core.LogOperator
 {
-    class LogOperator
+    public class LogOperator
     {
         private static TraceSource traceSource = null;
 

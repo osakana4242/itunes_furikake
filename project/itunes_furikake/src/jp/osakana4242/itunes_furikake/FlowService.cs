@@ -11,6 +11,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using jp.osakana4242.core.LogOperator;
+using jp.osakana4242.itunes_furikake.Properties;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -31,7 +32,7 @@ namespace jp.osakana4242.itunes_furikake
 				{
 					if (_result1 != null && _result1.errorMessage != null)
 					{
-						OkCancelDialog.ShowOK(owner, _result1.errorTitle, _result1.errorMessage);
+						OkCancelDialog.ShowOK(owner, "", _result1.errorMessage);
 					}
 				}, _ex =>
 				{
@@ -65,7 +66,6 @@ namespace jp.osakana4242.itunes_furikake
 			IITTrackCollection tracks = rubyAdder.iTunesApp.SelectedTracks;
 			if (tracks == null)
 			{
-				result.errorTitle = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrAppName;
 				result.errorMessage = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrTrack1;
 				return;
 			}
@@ -119,7 +119,6 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.errorTitle = Properties.Resources.StrAppName;
 				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
 		}
@@ -310,7 +309,6 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.errorTitle = Properties.Resources.StrAppName;
 				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
 		}
@@ -372,7 +370,6 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (0 < exceptionList.Count)
 			{
-				result.errorTitle = Properties.Resources.StrAppName;
 				result.errorMessage = Properties.Resources.StrErrTrack2;
 			}
 		}

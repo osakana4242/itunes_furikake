@@ -102,7 +102,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\jp\osakana4242\core\LogOperator.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\LogOperator.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\FormExt.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\FormsTimerScheduler.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\iTunesAppUtil.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\ErrorDialog.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\FlowService.cs" />

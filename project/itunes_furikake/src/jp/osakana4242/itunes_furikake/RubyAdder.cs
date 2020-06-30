@@ -11,7 +11,7 @@ namespace jp.osakana4242.itunes_furikake
     /// <summary>
     /// ルビを振る機能を提供.
     /// </summary>
-    public class RubyAdder
+    public class RubyAdder : System.IDisposable
     {
         private static readonly string BR = System.Environment.NewLine;
         public static TraceSource logger = LogOperator.get();
@@ -58,7 +58,7 @@ namespace jp.osakana4242.itunes_furikake
             this.iTunesApp = new iTunesApp();
         }
 
-        public void Exit()
+        public void Dispose()
         {
             if (this.iTunesApp != null)
             {

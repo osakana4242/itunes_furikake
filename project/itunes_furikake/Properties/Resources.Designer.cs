@@ -174,6 +174,15 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
+        ///   多重起動は出来ません に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErrAppDuplicate {
+            get {
+                return ResourceManager.GetString("StrErrAppDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ファイルが見つかりません。
         ///ファイル: {0} に類似しているローカライズされた文字列を検索します。
         /// </summary>
@@ -390,6 +399,15 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         public static string StrRootFormStatusBar2 {
             get {
                 return ResourceManager.GetString("StrRootFormStatusBar2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   iTunesふりかけ - 起動中 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrStartupFormTitle {
+            get {
+                return ResourceManager.GetString("StrStartupFormTitle", resourceCulture);
             }
         }
         

@@ -237,4 +237,10 @@ Web： https://osakana4242.sakura.ne.jp/</value>
   <data name="StrRootFormStatusBar2" xml:space="preserve">
     <value>処理したいトラックを iTunes で選択してください。</value>
   </data>
+  <data name="StrErrAppDuplicate" xml:space="preserve">
+    <value>多重起動は出来ません</value>
+  </data>
+  <data name="StrStartupFormTitle" xml:space="preserve">
+    <value>iTunesふりかけ - 起動中</value>
+  </data>
 </root>

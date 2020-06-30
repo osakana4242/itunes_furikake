@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Threading;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -21,6 +22,39 @@ namespace jp.osakana4242.itunes_furikake
         System.Action<ProgressResult> onCompleted;
         string titleTextLeft = "";
         string bodyTextLeft = "";
+
+        public static IObservable<T> ShowDialogAsync<T>(RootForm root, ProgressDialog.Config config, IObservable<T> stream)
+        {
+            System.Action<BackgroundWorker, DoWorkEventArgs, int> onProgress = (_bw, _evtArgs, _prm) =>
+            {
+                var isEnd = false;
+                stream.Subscribe(_result =>
+                {
+                    var pr = new ProgressResult();
+                    pr.result = _result;
+                    _evtArgs.Result = pr;
+                    isEnd = true;
+                });
+                while (!isEnd)
+                {
+                    Thread.Sleep(100);
+                }
+            };
+
+            return Observable.Create<T>(_obs =>
+            {
+                ShowDialog(root, config, 0, onProgress, _result =>
+                {
+                    _obs.OnNext((T)_result.result);
+                    _obs.OnCompleted();
+                }, _ex =>
+                {
+                    _obs.OnError(_ex);
+                });
+
+                return Disposable.Empty;
+            });
+        }
 
         public static IObservable<ProgressResult> ShowDialogAsync<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress)
         {
@@ -138,8 +172,11 @@ namespace jp.osakana4242.itunes_furikake
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.result = (ProgressResult)e.Result;
-            this.result.isNeedConfirm = checkBox1.Checked;
+            this.result = e.Result as ProgressResult;
+            if (null != this.result)
+            {
+                this.result.isNeedConfirm = checkBox1.Checked;
+            }
             this.Close();
         }
 
@@ -162,8 +199,11 @@ namespace jp.osakana4242.itunes_furikake
         {
             //this.Owner.Enabled = true;
             //this.onCompleted(this.result);
-            FlowService.Delay(Tuple.Create(this.Owner, this.onCompleted, this.result), _prm => {
-                _prm.Item1.Enabled = true;
+            FlowService.Delay(ValueTuple.Create(this.Owner, this.onCompleted, this.result), _prm => {
+                if (null != _prm.Item1)
+                {
+                    _prm.Item1.Enabled = true;
+                }
                 _prm.Item2(_prm.Item3);
             });
         }
@@ -226,8 +266,8 @@ namespace jp.osakana4242.itunes_furikake
 
     public sealed class ProgressResult
     {
+        public object result;
         public Exception ex;
-        public string errorTitle;
         public string errorMessage;
         public bool isNeedConfirm;
         public TrackID[] trackIDList = { };

@@ -10,6 +10,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Threading;
+using Timer = System.Windows.Forms.Timer;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -22,6 +23,7 @@ namespace jp.osakana4242.itunes_furikake
         System.Action<ProgressResult> onCompleted;
         string titleTextLeft = "";
         string bodyTextLeft = "";
+        public static DateTimeOffset lastPaintTime;
 
         public static IObservable<T> ShowDialogAsync<T>(RootForm root, ProgressDialog.Config config, IObservable<T> stream)
         {
@@ -84,6 +86,10 @@ namespace jp.osakana4242.itunes_furikake
                 {
                     onProgress((BackgroundWorker)_sender, _e, (T)_e.Argument);
                 }
+                catch (CancelException)
+                {
+                    // 中断
+                }
                 catch (Exception ex2)
                 {
                     // メインスレッドで通知したい.
@@ -119,7 +125,22 @@ namespace jp.osakana4242.itunes_furikake
 
             this.titleTextLeft = Properties.Resources.StrExecuting;
             this.Text = this.titleTextLeft;
+            timer_.Enabled = true;
+            timer_.Interval = 100;
+            timer_.Tick += (_a, _b) =>
+            {
+                if (IsNeedReflesh)
+                {
+                    this.Refresh();
+                }
+            };
+
+            this.Paint += (_a, _b) =>
+            {
+                lastPaintTime = DateTimeOffset.Now;
+            };
         }
+        Timer timer_ = new Timer();
 
         public void SetProgressParams(string label, int value, int minValue, int maxValue)
         {
@@ -146,18 +167,17 @@ namespace jp.osakana4242.itunes_furikake
                 return;
             }
 
-            this.progressBar1.Maximum = state.total;
-            this.progressBar1.Value = state.progress;
+            this.progressBar1.Maximum = (int)(state.Progress.total * 100);
+            this.progressBar1.Value = (int)(state.Progress.value * 100);
 
             if (state.Title != null)
             {
                 this.titleTextLeft = state.Title;
             }
 
-			float percentage = (state.progress * 100f / state.total);
-			this.Text = string.Format("{0} - {1:F2}%",this.titleTextLeft, percentage);
+			this.Text = string.Format("{0} - {1:F2}%",this.titleTextLeft, state.Progress.Percentage());
 
-            this.label1.Text = string.Format("{0} / {1}", state.progress, state.total);
+            this.label1.Text = string.Format("{0} / {1}", (int)state.Progress.value, (int)state.Progress.total);
 			if (state.Text != null)
             {
                 this.bodyTextLeft = state.Text;
@@ -168,7 +188,13 @@ namespace jp.osakana4242.itunes_furikake
             {
                 this.rootForm.AddLog(state.Log);
             }
+            if (IsNeedReflesh)
+            {
+                this.Refresh();
+            }
         }
+
+        bool IsNeedReflesh => lastPaintTime + TimeSpan.FromSeconds(0.1f) <= DateTimeOffset.Now;
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -179,9 +205,12 @@ namespace jp.osakana4242.itunes_furikake
             }
             this.Close();
         }
+        public static Thread mainThread_;
 
         private void ProgressDialog_Shown(object sender, EventArgs e)
         {
+            mainThread_ = Thread.CurrentThread;
+            this.timer_.Start();
             this.backgroundWorker1.RunWorkerAsync(this.workArg);
         }
 
@@ -197,6 +226,7 @@ namespace jp.osakana4242.itunes_furikake
 
         private void ProgressDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
+            this.timer_.Stop();
             //this.Owner.Enabled = true;
             //this.onCompleted(this.result);
             FlowService.Delay(ValueTuple.Create(this.Owner, this.onCompleted, this.result), _prm => {
@@ -233,43 +263,5 @@ namespace jp.osakana4242.itunes_furikake
             public string checkboxLabel;
             public bool checkboxChecked;
         }
-    }
-
-    public sealed class ProgressDialogState
-    {
-        public readonly int progress;
-        public readonly int total;
-        public readonly string Title = null;
-        public readonly string Text = null;
-        public readonly string Log = null;
-        public ProgressDialogState(int progress, int total, string title, string text, string log)
-        {
-            this.progress = progress;
-            this.total = total;
-            this.Title = title;
-            this.Text = text;
-            this.Log = log;
-        }
-
-        public static void ReportWithTitle(BackgroundWorker bw, int progress, int total, string title = null)
-        {
-            var self = new ProgressDialogState(progress, total, title, null, null);
-            bw.ReportProgress(progress * 100 / total, self);
-        }
-
-        public static void Report(BackgroundWorker bw, int progress, int total, string text = null, string log = null)
-        {
-            var self = new ProgressDialogState(progress, total, null, text, log);
-            bw.ReportProgress( progress * 100 / total, self);
-        }
-    }
-
-    public sealed class ProgressResult
-    {
-        public object result;
-        public Exception ex;
-        public string errorMessage;
-        public bool isNeedConfirm;
-        public TrackID[] trackIDList = { };
     }
 }

@@ -53,8 +53,8 @@ namespace jp.osakana4242.itunes_furikake
                 {
                     var progress = 0;
                     var progressTotal = 2;
-                    ProgressDialogState.ReportWithTitle(_bw, progress, progressTotal, Resources.StrStartupFormTitle);
-                    ProgressDialogState.Report(_bw, progress, progressTotal, "");
+                    ProgressDialogState.ReportWithTitle(_bw, new ProgressPair(progress, progressTotal), Resources.StrStartupFormTitle);
+                    ProgressDialogState.Report(_bw, new ProgressPair(progress, progressTotal), "");
                     ProgressResult result = new ProgressResult();
                     _evtArgs.Result = result;
                     bool isEndStream = false;
@@ -64,14 +64,14 @@ namespace jp.osakana4242.itunes_furikake
                         CleanFiles();
                         logger.TraceEvent(TraceEventType.Information, 0, "itunes_furikake init.");
                         ++progress;
-                        ProgressDialogState.Report(_bw, progress, progressTotal);
+                        ProgressDialogState.Report(_bw, new ProgressPair(progress, progressTotal));
                     }).
                     ObserveOn(FormsTimerScheduler.Instance).
                     Select(_2 =>
                     {
                         var form = new RootForm();
                         ++progress;
-                        ProgressDialogState.Report(_bw, progress, progressTotal);
+                        ProgressDialogState.Report(_bw, new ProgressPair(progress, progressTotal));
                         return form;
                     }).
                     Delay(System.TimeSpan.FromSeconds(0.5f), FormsTimerScheduler.Instance).

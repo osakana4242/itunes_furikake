@@ -12,6 +12,7 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using jp.osakana4242.core.LogOperator;
 using jp.osakana4242.itunes_furikake.Properties;
+using System.Threading;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -74,19 +75,32 @@ namespace jp.osakana4242.itunes_furikake
 			int targetTrackNum = tracks.Count;
 			StringBuilder sb = new StringBuilder();
 			// int targetFieldNum = tracks.Count * TrackFieldNames.Length;
+			DateTimeOffset nextSleep = DateTimeOffset.Now + TimeSpan.FromSeconds(1f);
+			string trackNameForLog = "";
+
+			string trackNameForDisplay = "";
 
 			foreach (IITTrack trackBase in tracks)
 			{
 				// 中断.
-				if (bgWorker.CancellationPending) return;
+				if (bgWorker.CancellationPending) throw new CancelException();
 				// 1トラック分の処理.
-				string trackNameForDisplay = getTrackNameSafe(trackBase);
+				trackNameForDisplay = getTrackNameSafe(trackBase);
 				try
 				{
 					sb.Clear();
 					if (!(trackBase is IITFileOrCDTrack track)) continue;
-					ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, trackNameForDisplay, string.Format("{0}:{1}{2}", endTrackNum + 1, trackNameForDisplay, BR));
-					RubyAdder.ExecTrack(rubyAdder, track, sb);
+					trackNameForLog = string.Format("{0}:{1}{2}", endTrackNum + 1, trackNameForDisplay, BR);
+					ProgressDialogState.Report(bgWorker, new ProgressPair(endTrackNum, targetTrackNum), trackNameForDisplay);
+					var prm = (bgWorker, endTrackNum, targetTrackNum, trackNameForDisplay);
+					var hasUpdate = RubyAdder.ExecTrack(rubyAdder, track, sb, prm, (_p, _prm) =>
+					{
+						ProgressDialogState.Report(_prm.bgWorker, new ProgressPair(_prm.endTrackNum + _p.Normalized(), _prm.targetTrackNum), _prm.trackNameForDisplay);
+					});
+				}
+				catch (CancelException ex)
+				{
+					throw ex;
 				}
 				catch (Exception ex)
 				{
@@ -96,24 +110,20 @@ namespace jp.osakana4242.itunes_furikake
 					sb.Append("トラックを編集出来ませんでした(スキップ)").Append(BR);
 					errorTrackNum += 1;
 				}
-				finally
-				{
-					endTrackNum += 1;
-					if (bgWorker != null)
-					{
-						//ProgressChangedイベントハンドラを呼び出し、
-						//コントロールの表示を変更する
-						ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, null, sb.ToString());
-					}
-				}
-			}
 
+				endTrackNum += 1;
+				if (0 < sb.Length)
+				{
+					sb.Insert(0, trackNameForLog);
+				}
+				ProgressDialogState.Report(bgWorker, new ProgressPair(endTrackNum, targetTrackNum), null, sb.ToString());
+			}
 
 			string log = BR
 				+ "エラートラック数: " + errorTrackNum + BR
 				+ "総トラック数: " + endTrackNum + BR
 				;
-			ProgressDialogState.Report(bgWorker, endTrackNum, targetTrackNum, null, log);
+			ProgressDialogState.Report(bgWorker, new ProgressPair(endTrackNum, targetTrackNum), null, log);
 
 			System.Threading.Thread.Sleep(1000);
 
@@ -229,7 +239,7 @@ namespace jp.osakana4242.itunes_furikake
 			// リストアップと削除の2工程.
 			opeData.total += tracks.Count * 2;
 			int errorTrackNum = 0;
-			ProgressDialogState.ReportWithTitle(bgWorker, opeData.progress, opeData.total, Properties.Resources.StrDeleteCheckProgress1);
+			ProgressDialogState.ReportWithTitle(bgWorker, new ProgressPair(opeData.progress, opeData.total), Properties.Resources.StrDeleteCheckProgress1);
 
 			/// 素直に foreach で Delete すると、
 			/// Delete を実行した数だけ要素がすっとばされてしまう.
@@ -291,7 +301,7 @@ namespace jp.osakana4242.itunes_furikake
 				finally
 				{
 					++opeData.progress;
-					ProgressDialogState.Report(bgWorker, opeData.progress, opeData.total, trackNameForDisplay, null);
+					ProgressDialogState.Report(bgWorker, new ProgressPair(opeData.progress, opeData.total), trackNameForDisplay, null);
 				}
 			}
 
@@ -299,7 +309,7 @@ namespace jp.osakana4242.itunes_furikake
 
 			if (trackIDList.Count <= 0)
 			{
-				ProgressDialogState.Report(bgWorker, opeData.progress, opeData.total,
+				ProgressDialogState.Report(bgWorker, new ProgressPair(opeData.progress, opeData.total),
 					null,
 					string.Format(Properties.Resources.StrDeleteCheckLog1, tracks.Count) + BR
 				);
@@ -316,7 +326,7 @@ namespace jp.osakana4242.itunes_furikake
 		/// <summary>削除処理とプログレスバーの進行</summary>
 		public static void DeleteTrackWithProgress(RubyAdderOpeData opeData, BackgroundWorker bw, DoWorkEventArgs evtArgs, iTunesApp iTunesApp, TrackID[] trackIDList)
 		{
-			ProgressDialogState.ReportWithTitle(bw, opeData.progress, opeData.total, Properties.Resources.StrDeleteProgress1);
+			ProgressDialogState.ReportWithTitle(bw, new ProgressPair(opeData.progress, opeData.total), Properties.Resources.StrDeleteProgress1);
 			var result = new ProgressResult();
 			evtArgs.Result = result;
 			var exceptionList = new List<Exception>();
@@ -335,7 +345,7 @@ namespace jp.osakana4242.itunes_furikake
 					IITTrack track = tracks.GetItemByTrackID_ext(trackID);
 					trackNameForDisplay = getTrackNameSafe(track);
 					track.Delete();
-					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,
 						 string.Format(Properties.Resources.StrDeleteOK, i + 1, trackNameForDisplay) + BR
 					);
@@ -344,7 +354,7 @@ namespace jp.osakana4242.itunes_furikake
 				catch (System.Exception ex)
 				{
 					exceptionList.Add(ex);
-					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,
 						string.Format(Properties.Resources.StrDeleteNG, i + 1, trackNameForDisplay) + BR
 					);
@@ -353,7 +363,7 @@ namespace jp.osakana4242.itunes_furikake
 				finally
 				{
 					++opeData.progress;
-					ProgressDialogState.Report(bw, opeData.progress, opeData.total,
+					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,
 						null
 					);
@@ -364,7 +374,7 @@ namespace jp.osakana4242.itunes_furikake
 				+ "エラートラック数: " + errorTrackNum + BR
 				+ "削除したトラック数: " + endTrackNum + BR
 				;
-			ProgressDialogState.Report(bw, opeData.progress, opeData.total, null, log);
+			ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total), null, log);
 
 			System.Threading.Thread.Sleep(1000);
 

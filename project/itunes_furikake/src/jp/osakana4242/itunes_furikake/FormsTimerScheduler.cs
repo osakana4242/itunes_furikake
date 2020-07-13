@@ -41,10 +41,6 @@ namespace jp.osakana4242.itunes_furikake
 
 		public DateTimeOffset Now => DateTimeOffset.Now;
 
-		void Update()
-		{
-		}
-
 		public IDisposable Schedule<TState>(TState state, Func<IScheduler, TState, IDisposable> action)
 		{
 			TimeSpan ts = TimeSpan.FromMilliseconds(0f);

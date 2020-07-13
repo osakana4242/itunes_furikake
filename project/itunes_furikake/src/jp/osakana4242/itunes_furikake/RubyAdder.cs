@@ -4,6 +4,7 @@ using System.Diagnostics;
 using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
+using jp.osakana4242.itunes_furikake.Properties;
 
 namespace jp.osakana4242.itunes_furikake
 {
@@ -87,12 +88,17 @@ namespace jp.osakana4242.itunes_furikake
         }
 
 
-        public static void SetFieldIfNeeded(RubyAdder rubyAdder, IITFileOrCDTrack track, TrackFieldAccessor accessor, TrackFieldPair before, TrackFieldPair after)
+        public static bool SetFieldIfNeeded<T>(RubyAdder rubyAdder, IITFileOrCDTrack track, TrackFieldAccessor accessor, TrackFieldPair before, TrackFieldPair after, T opt, System.Action<ProgressPair, T> reportFunc)
         {
+            reportFunc(new ProgressPair(0f, 2f), opt);
             bool isNeedUpdateField = before.field != after.field;
             // フィールドが更新されると、よみがながリセットされてしまうので、変更が無くても設定し直す必要がある.
             bool isNeedUpdateSortField = isNeedUpdateField || before.sortField != after.sortField;
-
+            if ( BuildFlag.TrackFieldForceUpdateEnabled )
+            {
+                isNeedUpdateField = true;
+                isNeedUpdateSortField = true;
+            }
             if (isNeedUpdateField)
             {
                 if (ConvertHelper.IsNeedSetDummyField(rubyAdder, before.field, after.field))
@@ -101,6 +107,7 @@ namespace jp.osakana4242.itunes_furikake
                     accessor.setField(track, after.field + "_");
                 }
                 accessor.setField(track, after.field);
+                reportFunc(new ProgressPair(1f, 2f), opt);
             }
 
             if (isNeedUpdateSortField)
@@ -111,7 +118,9 @@ namespace jp.osakana4242.itunes_furikake
                     accessor.setSortField(track, after.sortField + "_");
                 }
                 accessor.setSortField(track, after.sortField);
+                reportFunc(new ProgressPair(2f, 2f), opt);
             }
+            return isNeedUpdateField || isNeedUpdateSortField;
         }
 
         /** 変化分を sb に追記する.  */
@@ -130,9 +139,14 @@ namespace jp.osakana4242.itunes_furikake
         }
 
         /** トラックに対する処理の実行. */
-        public static void ExecTrack(RubyAdder rubyAdder, IITFileOrCDTrack track, System.Text.StringBuilder sb)
+        public static bool ExecTrack<T>(RubyAdder rubyAdder, IITFileOrCDTrack track, System.Text.StringBuilder sb, T prm1, System.Action<ProgressPair, T> reportFunc)
         {
-            foreach (var accessor in TrackFieldAccessor.items)
+            bool hasUpdate = false;
+            var items = TrackFieldAccessor.items;
+            var progress = 0;
+            var total = items.Length;
+            reportFunc(new ProgressPair(progress, total), prm1);
+            foreach (var accessor in items)
             {
                 var pair = new TrackFieldPair()
                 {
@@ -140,9 +154,16 @@ namespace jp.osakana4242.itunes_furikake
                     sortField = accessor.getSortField(track),
                 };
                 var pairAfter = GetProcessedPair(rubyAdder, pair);
-                SetFieldIfNeeded(rubyAdder, track, accessor, pair, pairAfter);
+                var prm2 = (reportFunc, prm1, progress, total);
+                hasUpdate |= SetFieldIfNeeded(rubyAdder, track, accessor, pair, pairAfter, prm2, (_p, _prm2) =>
+                {
+                    var n = _p.Normalized();
+                    _prm2.reportFunc(new ProgressPair(_prm2.progress + n, _prm2.total), _prm2.prm1);
+                });
                 AddDiff(rubyAdder, pair, pairAfter, sb);
+                ++progress;
             }
+            return hasUpdate;
         }
 
         public static TrackFieldPair ClearSortField(RubyAdder rubyAdder, TrackFieldPair pair)

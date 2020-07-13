@@ -102,6 +102,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\jp\osakana4242\itunes_furikake\BuildFlag.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\LogOperator.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\FormExt.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\FormsTimerScheduler.cs" />
@@ -116,6 +117,9 @@
       <DependentUpon>OkCancelDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="src\jp\osakana4242\itunes_furikake\LoadHelper.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\ProgressDialogResult.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\ProgressDialogState.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\ProgressPair.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdderOpeData.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\RubyAdderOpeType.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\TableFieldPair.cs" />

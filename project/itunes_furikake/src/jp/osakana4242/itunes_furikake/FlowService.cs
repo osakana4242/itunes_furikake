@@ -332,9 +332,6 @@ namespace jp.osakana4242.itunes_furikake
 			var exceptionList = new List<Exception>();
 			int errorTrackNum = 0;
 			int endTrackNum = 0;
-			// プレイリスト経由で iTunesApp.SelectedTracks から削除すると、プレイリストからしか削除されない.
-			// iTunesApp.LibraryPlaylist.Tracks からなら、確実にライブラリから削除できる.
-			IITTrackCollection tracks = iTunesApp.LibraryPlaylist.Tracks;
 			for (int i = 0, iCount = trackIDList.Length; i < iCount; ++i)
 			{
 				if (bw.CancellationPending) return;
@@ -342,9 +339,26 @@ namespace jp.osakana4242.itunes_furikake
 				string trackNameForDisplay = "-";
 				try
 				{
-					IITTrack track = tracks.GetItemByTrackID_ext(trackID);
-					trackNameForDisplay = getTrackNameSafe(track);
-					track.Delete();
+					// 確実にライブラリから削除するために
+					// iTunesApp.SelectedTracks ではなく、
+					// iTunesApp.LibraryPlaylist.Tracks
+					// から削除する.
+					//
+					// iTunesApp.SelectedTracks から削除すると、
+					// プレイリストのトラックを選択してた場合は
+					// プレイリストからは削除されるが、ライブラリには残ってしまう.
+					//
+					//
+					// ・LibraryPlaylist.Tracks は都度 iTunesApp から取得する.
+					// Delete 後にアクセスすると下記の例外が吐かれるため.
+					//
+					// System.Runtime.InteropServices.COMException
+					// The playlist has been deleted.
+					{
+						IITTrack track = iTunesApp.LibraryPlaylist.Tracks.GetItemByTrackID_ext(trackID);
+						trackNameForDisplay = getTrackNameSafe(track);
+						track.Delete();
+					}
 					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,
 						 string.Format(Properties.Resources.StrDeleteOK, i + 1, trackNameForDisplay) + BR
@@ -353,6 +367,7 @@ namespace jp.osakana4242.itunes_furikake
 				}
 				catch (System.Exception ex)
 				{
+					logger.TraceEvent(TraceEventType.Error, 0, "トラックの削除に失敗しました. ex: " + ex.Message);
 					exceptionList.Add(ex);
 					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,

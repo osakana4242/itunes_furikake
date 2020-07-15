@@ -1,4 +1,6 @@
-﻿namespace jp.osakana4242.itunes_furikake
+﻿using jp.osakana4242.itunes_furikake.Properties;
+
+namespace jp.osakana4242.itunes_furikake
 {
     partial class RootForm
     {
@@ -219,7 +221,7 @@
 			this.groupBox1.Size = new System.Drawing.Size(171, 143);
 			this.groupBox1.TabIndex = 10;
 			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "読みを降る";
+			this.groupBox1.Text = Resources.StrMenuCommandGroupRuby;
 			// 
 			// statusStrip1
 			// 

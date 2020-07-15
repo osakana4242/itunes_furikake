@@ -153,7 +153,7 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>'{0}'のインスタンスが作成できません。</value>
   </data>
   <data name="StrDeleteCheckLog1" xml:space="preserve">
-    <value>{0}件の中に削除対象のトラックはみつかりませんでした。</value>
+    <value>{0}件の中に削除対象となるトラックはみつかりませんでした。</value>
   </data>
   <data name="StrDeleteCheckProgress1" xml:space="preserve">
     <value>検索中</value>
@@ -186,13 +186,13 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>実体の無いトラックの削除</value>
   </data>
   <data name="StrMenuCommandGroupRuby" xml:space="preserve">
-    <value>読みを降る</value>
+    <value>読みを振る</value>
   </data>
   <data name="StrMenuCommandRubyHiragana" xml:space="preserve">
-    <value>ひらがなで読みを降る</value>
+    <value>ひらがなで読みを振る</value>
   </data>
   <data name="StrMenuCommandRubyKatakana" xml:space="preserve">
-    <value>カタカナで読みを降る</value>
+    <value>カタカナで読みを振る</value>
   </data>
   <data name="StrMenuCommandRubyOverwrite" xml:space="preserve">
     <value>読みを上書きする</value>
@@ -201,7 +201,7 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>すでに読みが振られているトラックに対しても、読みを振りなおします。</value>
   </data>
   <data name="StrMenuCommandRubyRome" xml:space="preserve">
-    <value>ローマ時で読みを降る</value>
+    <value>ローマ時で読みを振る</value>
   </data>
   <data name="StrMenuCommandZenkakuToHankaku" xml:space="preserve">
     <value>全角英数を半角にする</value>
@@ -238,7 +238,7 @@ Web： https://osakana4242.sakura.ne.jp/</value>
     <value>処理したいトラックを iTunes で選択してください。</value>
   </data>
   <data name="StrErrAppDuplicate" xml:space="preserve">
-    <value>多重起動は出来ません</value>
+    <value>多重起動は出来ません。</value>
   </data>
   <data name="StrStartupFormTitle" xml:space="preserve">
     <value>iTunesふりかけ - 起動中</value>

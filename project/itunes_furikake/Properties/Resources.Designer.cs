@@ -93,7 +93,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   {0}件の中に削除対象のトラックはみつかりませんでした。 に類似しているローカライズされた文字列を検索します。
+        ///   {0}件の中に削除対象となるトラックはみつかりませんでした。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrDeleteCheckLog1 {
             get {
@@ -174,7 +174,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   多重起動は出来ません に類似しているローカライズされた文字列を検索します。
+        ///   多重起動は出来ません。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrErrAppDuplicate {
             get {
@@ -277,7 +277,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   読みを降る に類似しているローカライズされた文字列を検索します。
+        ///   読みを振る に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrMenuCommandGroupRuby {
             get {
@@ -286,7 +286,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   ひらがなで読みを降る に類似しているローカライズされた文字列を検索します。
+        ///   ひらがなで読みを振る に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrMenuCommandRubyHiragana {
             get {
@@ -295,7 +295,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   カタカナで読みを降る に類似しているローカライズされた文字列を検索します。
+        ///   カタカナで読みを振る に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrMenuCommandRubyKatakana {
             get {
@@ -322,7 +322,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   ローマ時で読みを降る に類似しているローカライズされた文字列を検索します。
+        ///   ローマ時で読みを振る に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrMenuCommandRubyRome {
             get {

@@ -279,7 +279,6 @@ namespace jp.osakana4242.itunes_furikake
 						continue;
 					}
 
-					Console.WriteLine($"{ track.Enabled }");
 					var path = track.Location;
 					var exists = System.IO.File.Exists(path);
 
@@ -358,6 +357,7 @@ namespace jp.osakana4242.itunes_furikake
 						IITTrack track = iTunesApp.LibraryPlaylist.Tracks.GetItemByTrackID_ext(trackID);
 						trackNameForDisplay = getTrackNameSafe(track);
 						track.Delete();
+
 					}
 					ProgressDialogState.Report(bw, new ProgressPair(opeData.progress, opeData.total),
 						trackNameForDisplay,

@@ -117,6 +117,7 @@ namespace jp.osakana4242.itunes_furikake
             this.backgroundWorker1.DoWork += work;
             this.workArg = workArg;
             this.label1.Text = "";
+            this.label2.Text = "";
             this.rootForm = rootForm;
             this.onCompleted = onCompleted;
             this.checkBox1.Visible = !string.IsNullOrEmpty( config.checkboxLabel );
@@ -237,26 +238,6 @@ namespace jp.osakana4242.itunes_furikake
                 _prm.Item2(_prm.Item3);
             });
         }
-
-        private void ProgressDialog_Load(object sender, EventArgs e)
-        {
-
-        }
-
-		private void label2_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void label1_Click(object sender, EventArgs e)
-		{
-
-		}
-
-		private void checkBox1_CheckedChanged(object sender, EventArgs e)
-		{
-
-		}
 
         public struct Config
         {

@@ -33,6 +33,18 @@ using System.Resources;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.3.0.0")]
-[assembly: AssemblyFileVersion("2.3.0.0")]
+[assembly: AssemblyVersion("2.3.1.0")]
+// [assembly: AssemblyFileVersion("0.0.0.0")]
+// [assembly: AssemblyInformationalVersion("0.0.0.0")]
+// from: https://atmarkit.itmedia.co.jp/fdotnet/dotnettips/187asmverinfo/asmverinfo.html
+// バージョン情報には
+// 「アセンブリ・バージョン（Assembly Version）」
+// 「ファイル・バージョン」
+// 「製品バージョン」
+// という3つのバージョン番号がある。
+// それぞれ「.NETアセンブリ用」「Win32ファイル・システム用」「プログラム用」となっているが、
+// 多くの場合、これらの番号を個々に使い分ける必要はないだろう。
+// すべて同じバージョン番号とする場合には、アセンブリ・バージョンのみを設定しておけば、
+// ほかのファイル・バージョンと製品バージョンにも同じバージョン番号が自動設定される。
+
 [assembly: NeutralResourcesLanguageAttribute("ja-JP")]

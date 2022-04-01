@@ -117,21 +117,18 @@ namespace jp.osakana4242.itunes_furikake
 			}
 		}
 
-		/// <summary>トラックの選択状態に応じて、各種コンポーネントの表示を切り替える.</summary>
-		void UpdateComponentStatus()
+        /// <summary>トラックの選択状態に応じて、各種コンポーネントの表示を切り替える.</summary>
+        void UpdateComponentStatus()
 		{
-			int selectedTracksCount = 0;
-			try
-			{
-				var iTunesApp = rubyAdder.iTunesApp;
-				var tracks = iTunesApp.SelectedTracks;
-				selectedTracksCount = tracks?.Count ?? 0;
-			}
-			catch (System.Exception ex)
-			{
-				throw new AppDisplayableException("iTunes への接続に失敗しました");
-//				Console.WriteLine($"ex: {ex}");
-			}
+			int selectedTracksCount;
+            if (RubyAdder.TryGetSelectedTracks(rubyAdder, out var tracks))
+            {
+				selectedTracksCount = tracks.Count;
+            }
+            else
+            {
+                selectedTracksCount = 0;
+            }
 
 			var hasSelectedTrack = 0 < selectedTracksCount;
 			this.toolStripStatusLabel1.Text = hasSelectedTrack ?
@@ -164,12 +161,12 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void timer1_Tick(object sender, EventArgs e)
 		{
-			UpdateComponentStatus();
+            UpdateComponentStatus();
 		}
 
 		private void RootForm_SizeChanged(object sender, EventArgs e)
 		{
-			UpdateComponentStatus();
+            UpdateComponentStatus();
 			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
 	}

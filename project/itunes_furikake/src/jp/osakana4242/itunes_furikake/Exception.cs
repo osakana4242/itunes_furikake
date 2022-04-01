@@ -33,6 +33,10 @@ namespace jp.osakana4242.itunes_furikake
         public AppDisplayableException(string displayMessage, Exception ex)
             : base(displayMessage, ex)
         {
+            if (BuildFlag.IsDebug)
+            {
+                Console.WriteLine($"ex: {ex}");
+            }
             this.displayMessage = displayMessage;
         }
 

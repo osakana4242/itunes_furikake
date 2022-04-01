@@ -187,5 +187,29 @@ namespace jp.osakana4242.itunes_furikake
             pair.sortField = ConvertHelper.ToHankaku(rubyAdder, pair.sortField);
             return pair;
         }
+
+        public static bool TryGetSelectedTracks(RubyAdder rubyAdder, out IITTrackCollection tracks)
+        {
+            try
+            {
+                var iTunesApp = rubyAdder.iTunesApp;
+                tracks = iTunesApp.SelectedTracks;
+                if (null == tracks) return false;
+                if (tracks.Count <= 0) return false;
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                if (BuildFlag.IsDebug)
+                {
+                    // ex: 'System.Runtime.InteropServices.COMException (0x80004005): エラー HRESULT E_FAIL が COM コンポーネントの呼び出しから返されました。
+                    // 場所 iTunesLib.IiTunes.get_SelectedTracks()
+                    // 場所 jp.osakana4242.itunes_furikake.RootForm.UpdateComponentStatus() 場所 C:\Users\osakana4242\prj\itunes_furikake\project\itunes_furikake\src\jp\osakana4242\itunes_furikake\RootForm.cs:行 139'
+                    System.Console.WriteLine($"ex: '{ex}'");
+                }
+                tracks = null;
+                return false;
+            }
+        }
     }
 }

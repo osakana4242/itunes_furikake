@@ -1,0 +1,6 @@
+*.pdb
+*.suo
+*.pfx
+
+/packages/
+/.vs/

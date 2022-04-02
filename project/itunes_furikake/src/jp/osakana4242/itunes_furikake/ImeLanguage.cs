@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace emanual.IME
 {
-  public class ImeLanguage
+  public class ImeLanguage : System.IDisposable
   {
     private bool FInitialized = false;
 

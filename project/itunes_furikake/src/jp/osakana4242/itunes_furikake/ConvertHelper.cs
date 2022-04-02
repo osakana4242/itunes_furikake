@@ -11,132 +11,108 @@ using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
 
-namespace jp.osakana4242.itunes_furikake
-{
-    public static class ConvertHelper
-    {
-        public static string MakeSortField(RubyAdder rubyAdder, string baseField)
-        {
-            if (baseField.Length <= 0) return "";
+namespace jp.osakana4242.itunes_furikake {
+	public static class ConvertHelper {
+		public static string MakeSortField(RubyAdder rubyAdder, string baseField) {
+			if (baseField.Length <= 0) return "";
 
-            string ruby = "";
-            // 単語リストから変換。
-            if (!rubyAdder.dictWord2Hiragana.TryGetValue(baseField, out ruby))
-            {
-                ruby = baseField;
-            }
+			string ruby = "";
+			// 単語リストから変換。
+			if (!rubyAdder.dictWord2Hiragana.TryGetValue(baseField, out ruby)) {
+				ruby = baseField;
+			}
 
-            switch (rubyAdder.opeData.ope)
-            {
-                case RubyAdderOpeType.HIRAGANA:
-                    ruby = ToHiragana(rubyAdder, ruby);
-                    break;
-                case RubyAdderOpeType.KATAKANA:
-                    ruby = ToKatakana(rubyAdder, ruby);
-                    break;
-                case RubyAdderOpeType.ALPHABET:
-                    ruby = ToAlphabet(rubyAdder, ruby);
-                    break;
-            }
-            return ruby;
-        }
+			switch (rubyAdder.opeData.ope) {
+				case RubyAdderOpeType.HIRAGANA:
+					ruby = ToHiragana(rubyAdder, ruby);
+					break;
+				case RubyAdderOpeType.KATAKANA:
+					ruby = ToKatakana(rubyAdder, ruby);
+					break;
+				case RubyAdderOpeType.ALPHABET:
+					ruby = ToAlphabet(rubyAdder, ruby);
+					break;
+			}
+			return ruby;
+		}
 
-        /// <summary>ひらがな化.</summary>
-        public static string ToHiragana(RubyAdder rubyAdder, string src)
-        {
-            string dest;
-            if (StringHelper.IsAscii(src))
-            {
-                // 読みがな不要.
-                return "";
-            }
-            else
-            {
-                // 読みをふる対象を漢字、ひらがな、カタカナに限定する.
-                using (TemporaryListPool<YomiWord>.instance_g.Alloc(out var wordList))
-                {
-                    YomiWordUtil.GetYomiWordList(src, wordList);
-                    var sb = new System.Text.StringBuilder();
-                    for (int i = 0, iCount = wordList.Count; i < iCount; ++i)
-                    {
-                        YomiWord item = wordList[i];
-                        if (item.isNeedYomi)
-                        {
-                            var word2 = rubyAdder.imeLanguage.GetYomi(item.word);
-                            sb.Append(word2);
-                        }
-                        else
-                        {
-                            sb.Append(item.word);
-                        }
-                    }
-                    dest = sb.ToString();
-                    dest = ToHankaku(rubyAdder, dest);
-                }
-            }
-            return dest;
-        }
+		/// <summary>ひらがな化.</summary>
+		public static string ToHiragana(RubyAdder rubyAdder, string src) {
+			string dest;
+			if (StringHelper.IsAscii(src)) {
+				// 読みがな不要.
+				return "";
+			} else {
+				// 読みをふる対象を漢字、ひらがな、カタカナに限定する.
+				using (TemporaryListPool<YomiWord>.instance_g.Alloc(out var wordList)) {
+					YomiWordUtil.GetYomiWordList(src, wordList);
+					var sb = new System.Text.StringBuilder();
+					for (int i = 0, iCount = wordList.Count; i < iCount; ++i) {
+						YomiWord item = wordList[i];
+						if (item.isNeedYomi) {
+							var word2 = rubyAdder.imeLanguage.GetYomi(item.word);
+							sb.Append(word2);
+						} else {
+							sb.Append(item.word);
+						}
+					}
+					dest = sb.ToString();
+					dest = ToHankaku(rubyAdder, dest);
+				}
+			}
+			return dest;
+		}
 
-        /// <summary>カタカナ化.</summary>
-        public static string ToKatakana(RubyAdder rubyAdder, string src)
-        {
-            string hiragana = ToHiragana(rubyAdder, src);
-            return ToHoge(hiragana, rubyAdder.dictHiragana2Katakana);
-        }
+		/// <summary>カタカナ化.</summary>
+		public static string ToKatakana(RubyAdder rubyAdder, string src) {
+			string hiragana = ToHiragana(rubyAdder, src);
+			return ToHoge(hiragana, rubyAdder.dictHiragana2Katakana);
+		}
 
-        /// <summary>アルファベット化.</summary>
-        public static string ToAlphabet(RubyAdder rubyAdder, string src)
-        {
-            string hiragana = ToHiragana(rubyAdder, src);
-            return ToHoge(hiragana, rubyAdder.dictHiragana2Rome);
-        }
+		/// <summary>アルファベット化.</summary>
+		public static string ToAlphabet(RubyAdder rubyAdder, string src) {
+			string hiragana = ToHiragana(rubyAdder, src);
+			return ToHoge(hiragana, rubyAdder.dictHiragana2Rome);
+		}
 
-        public static string ToHankaku(RubyAdder rubyAdder, string src)
-        {
-            return ToHankaku(rubyAdder.dictZen2Han, src);
-        }
+		public static string ToHankaku(RubyAdder rubyAdder, string src) {
+			return ToHankaku(rubyAdder.dictZen2Han, src);
+		}
 
-        /// <summary>全角半角.</summary>
-        public static string ToHankaku(Dictionary<char, char> dictZen2Han, string src)
-        {
-            var sb = new System.Text.StringBuilder(src.Length);
-            foreach (char c in src)
-            {
-                char nextC;
-                if (!dictZen2Han.TryGetValue(c, out nextC))
-                {
-                    nextC = c;
-                }
-                sb.Append(nextC);
-            }
-            return sb.ToString();
-        }
+		/// <summary>全角半角.</summary>
+		public static string ToHankaku(Dictionary<char, char> dictZen2Han, string src) {
+			var sb = new System.Text.StringBuilder(src.Length);
+			foreach (char c in src) {
+				char nextC;
+				if (!dictZen2Han.TryGetValue(c, out nextC)) {
+					nextC = c;
+				}
+				sb.Append(nextC);
+			}
+			return sb.ToString();
+		}
 
-        /// <summary>指定文字列を指定の辞書で置換.</summary>
-        public static string ToHoge(string src, Dictionary<string, string> hToHoge)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (char c in src)
-            {
-                string s = c.ToString();
-                string outS = s;
-                if (!hToHoge.TryGetValue(s, out outS))
-                {
-                    outS = s;
-                }
-                sb.Append(outS);
-            }
-            return sb.ToString();
-        }
+		/// <summary>指定文字列を指定の辞書で置換.</summary>
+		public static string ToHoge(string src, Dictionary<string, string> hToHoge) {
+			StringBuilder sb = new StringBuilder();
+			foreach (char c in src) {
+				string s = c.ToString();
+				string outS = s;
+				if (!hToHoge.TryGetValue(s, out outS)) {
+					outS = s;
+				}
+				sb.Append(outS);
+			}
+			return sb.ToString();
+		}
 
-        /// <summary>
-        /// ダミー文字を混じえた変更が必要か.
-        /// iTunes で文字種の変更だけでは更新が無かったことにされてしまう問題の対策用.
-        /// </summary>
-        public static bool IsNeedSetDummyField(RubyAdder rubyAdder, string a, string b)
-        {
-            if (ToHankaku(rubyAdder, a) != ToHankaku(rubyAdder, b)) return false;
-            return true;
-        }
-    }
+		/// <summary>
+		/// ダミー文字を混じえた変更が必要か.
+		/// iTunes で文字種の変更だけでは更新が無かったことにされてしまう問題の対策用.
+		/// </summary>
+		public static bool IsNeedSetDummyField(RubyAdder rubyAdder, string a, string b) {
+			if (ToHankaku(rubyAdder, a) != ToHankaku(rubyAdder, b)) return false;
+			return true;
+		}
+	}
 }

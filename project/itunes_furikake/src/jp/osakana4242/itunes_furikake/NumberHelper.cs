@@ -11,13 +11,10 @@ using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
 
-namespace jp.osakana4242.itunes_furikake
-{
-    static class NumberHelper
-    {
-        public static int Percent(int a, int b)
-        {
-            return a * 100 / b;
-        }
-    }
+namespace jp.osakana4242.itunes_furikake {
+	static class NumberHelper {
+		public static int Percent(int a, int b) {
+			return a * 100 / b;
+		}
+	}
 }

@@ -11,34 +11,28 @@ using iTunesLib;
 
 using jp.osakana4242.core.LogOperator;
 
-namespace jp.osakana4242.itunes_furikake
-{
-    /// <summary>
-    /// ユーザに表示可能なコメントを持つ例外クラス.
-    /// </summary>
-    public class AppDisplayableException : Exception
-    {
-        public string displayMessage
-        {
-            get;
-            private set;
-        }
+namespace jp.osakana4242.itunes_furikake {
+	/// <summary>
+	/// ユーザに表示可能なコメントを持つ例外クラス.
+	/// </summary>
+	public class AppDisplayableException : Exception {
+		public string displayMessage {
+			get;
+			private set;
+		}
 
-        public AppDisplayableException(string displayMessage)
-            : base(displayMessage)
-        {
-            this.displayMessage = displayMessage;
-        }
+		public AppDisplayableException(string displayMessage)
+			: base(displayMessage) {
+			this.displayMessage = displayMessage;
+		}
 
-        public AppDisplayableException(string displayMessage, Exception ex)
-            : base(displayMessage, ex)
-        {
-            if (BuildFlag.IsDebug)
-            {
-                Console.WriteLine($"ex: {ex}");
-            }
-            this.displayMessage = displayMessage;
-        }
+		public AppDisplayableException(string displayMessage, Exception ex)
+			: base(displayMessage, ex) {
+			if (BuildFlag.IsDebug) {
+				Console.WriteLine($"ex: {ex}");
+			}
+			this.displayMessage = displayMessage;
+		}
 
-    }
+	}
 }

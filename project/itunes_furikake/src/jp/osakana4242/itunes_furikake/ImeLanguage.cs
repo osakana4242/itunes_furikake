@@ -1,16 +1,16 @@
-﻿/*
-    漢字の読みを取得するクラス。
-    http://www.kanazawa-net.ne.jp/~pmansato/net/net_tech_ime.htm から拝借。
-*/
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 
-namespace emanual.IME {
+namespace jp.osakana4242.itunes_furikake {
+	/// <summary>
+	/// Microsoft IME から漢字の読みを取得するクラス.
+	/// IME の学習内容により、得られる読みに差が出る.
+	/// 参考: http://www.kanazawa-net.ne.jp/~pmansato/net/net_tech_ime.htm
+	/// </summary>
 	public class ImeLanguage : System.IDisposable {
 		private bool FInitialized = false;
 

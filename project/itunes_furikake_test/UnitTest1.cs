@@ -8,7 +8,7 @@ namespace jp.osakana4242.itunes_furikake_test {
 	public class UnitTest1 {
 		[TestMethod]
 		public void GetYomiTest() {
-			using (var ime = new emanual.IME.ImeLanguage()) {
+			using (var ime = new ImeLanguage()) {
 				// ～ が「から」にされてしまう問題の確認.
 				// ほかの記号はどうだろう...
 				System.Console.Write($"~ to {ime.GetYomi("~")}\n");

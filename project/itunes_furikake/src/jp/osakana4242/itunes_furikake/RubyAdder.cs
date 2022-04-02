@@ -18,7 +18,7 @@ namespace jp.osakana4242.itunes_furikake {
 		public delegate void AddLogDelegate(string str);
 
 		public iTunesApp iTunesApp;
-		public emanual.IME.ImeLanguage imeLanguage; // 読み仮名取得クラス。
+		public ImeLanguage imeLanguage; // 読み仮名取得クラス。
 
 		public RubyAdderOpeData opeData = new RubyAdderOpeData();
 		public Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
@@ -48,7 +48,7 @@ namespace jp.osakana4242.itunes_furikake {
 			dictWord2Hiragana = LoadHelper.ReadDictS("dict/dict_word2h.txt");
 			dictZen2Han = LoadHelper.ReadDictC("dict/dict_zen2han.txt");
 
-			this.imeLanguage = new emanual.IME.ImeLanguage();
+			this.imeLanguage = new ImeLanguage();
 			this.iTunesApp = new iTunesApp();
 		}
 

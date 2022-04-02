@@ -1,12 +1,45 @@
-一部フォルダの説明
+# 一部フォルダの説明
 * outside_res - ビルド後 exe ファイルと同階層にそのままの状態で配置するリソース
 * cmd - ビルドの前後処理
 
-開発環境
-Visual Studio Community 2017
+# 開発環境
 
+Visual Studio Express 2017
 
-.NET Framework のバージョンおよび依存関係
+# .NET Framework のバージョンおよび依存関係
+
 https://docs.microsoft.com/ja-jp/dotnet/framework/migration-guide/versions-and-dependencies?redirectedfrom=MSDN#net-framework-4
 Windows10 標準搭載は 4.6
 
+# zip の作成手順
+
+* Release 版をリビルド
+* project/itunes_furikake/Release フォルダを release 下にコピーして
+itunes_furikake_v?_?_? にリネーム. 以降 product と呼ぶ.
+* project/itunes_furikake/docs/*.txt を product 下にコピー
+* product/lib フォルダを作成し、各種 dll をこの中に移動する. xml は実行に不要な
+ので削除
+* zip にする
+
+# product のファイル構成
+
+product
+| + itunes_furikake.exe
+| + itunes_furikake.exe.config
+| + メモ.txt
+| + 起動しないんだけど.txt
+|
++-dict
+| + dict_h2k.txt
+| + dict_h2r.txt
+| + dict_word2h.txt
+| + dict_zen2han.txt
+|
++-lib
+  + System.Reactive.dll
+  + System.ValueTuple.dll
+
+## itunes_furikake.exe.config ってなに
+
+ini ファイル的なもの
+project/itunes_furikake/app.config を元に生成されているようだ

@@ -104,7 +104,11 @@ namespace jp.osakana4242.itunes_furikake
 				}
 				catch (Exception ex)
 				{
-					// なんかエラー
+                    // なんかエラー
+                    if (BuildFlag.IsDebug)
+                    {
+                        Console.Write($"ex: {ex}\n");
+                    }
 					logger.TraceEvent(TraceEventType.Error, 0, $"トラックエラー. トラック名: {trackNameForDisplay}, ex: {ex.Message}");
 					exceptionList.Add(ex);
 					sb.Append("トラックを編集出来ませんでした(スキップ)").Append(BR);

@@ -41,8 +41,7 @@ namespace jp.osakana4242.itunes_furikake
             return ruby;
         }
 
-        /** ひらがな化。
-        */
+        /// <summary>ひらがな化.</summary>
         public static string ToHiragana(RubyAdder rubyAdder, string src)
         {
             string dest;
@@ -53,22 +52,39 @@ namespace jp.osakana4242.itunes_furikake
             }
             else
             {
-                dest = rubyAdder.imeLanguage.GetYomi(src);
-                dest = ToHankaku(rubyAdder, dest);
+                // 読みをふる対象を漢字、ひらがな、カタカナに限定する.
+                using (TemporaryListPool<YomiWord>.instance_g.Alloc(out var wordList))
+                {
+                    YomiWordUtil.GetYomiWordList(src, wordList);
+                    var sb = new System.Text.StringBuilder();
+                    for (int i = 0, iCount = wordList.Count; i < iCount; ++i)
+                    {
+                        YomiWord item = wordList[i];
+                        if (item.isNeedYomi)
+                        {
+                            var word2 = rubyAdder.imeLanguage.GetYomi(item.word);
+                            sb.Append(word2);
+                        }
+                        else
+                        {
+                            sb.Append(item.word);
+                        }
+                    }
+                    dest = sb.ToString();
+                    dest = ToHankaku(rubyAdder, dest);
+                }
             }
             return dest;
         }
 
-        /** カタカナ化。
-        */
+        /// <summary>カタカナ化.</summary>
         public static string ToKatakana(RubyAdder rubyAdder, string src)
         {
             string hiragana = ToHiragana(rubyAdder, src);
             return ToHoge(hiragana, rubyAdder.dictHiragana2Katakana);
         }
 
-        /** アルファベット化。
-        */
+        /// <summary>アルファベット化.</summary>
         public static string ToAlphabet(RubyAdder rubyAdder, string src)
         {
             string hiragana = ToHiragana(rubyAdder, src);
@@ -80,8 +96,7 @@ namespace jp.osakana4242.itunes_furikake
             return ToHankaku(rubyAdder.dictZen2Han, src);
         }
 
-        /** 全角半角
-        */
+        /// <summary>全角半角.</summary>
         public static string ToHankaku(Dictionary<char, char> dictZen2Han, string src)
         {
             var sb = new System.Text.StringBuilder(src.Length);
@@ -97,8 +112,7 @@ namespace jp.osakana4242.itunes_furikake
             return sb.ToString();
         }
 
-        /** 指定文字列を指定の辞書で置換.
-       */
+        /// <summary>指定文字列を指定の辞書で置換.</summary>
         public static string ToHoge(string src, Dictionary<string, string> hToHoge)
         {
             StringBuilder sb = new StringBuilder();
@@ -115,7 +129,10 @@ namespace jp.osakana4242.itunes_furikake
             return sb.ToString();
         }
 
-        /** ダミー文字を混じえた変更が必要か. */
+        /// <summary>
+        /// ダミー文字を混じえた変更が必要か.
+        /// iTunes で文字種の変更だけでは更新が無かったことにされてしまう問題の対策用.
+        /// </summary>
         public static bool IsNeedSetDummyField(RubyAdder rubyAdder, string a, string b)
         {
             if (ToHankaku(rubyAdder, a) != ToHankaku(rubyAdder, b)) return false;

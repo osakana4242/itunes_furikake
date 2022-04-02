@@ -102,6 +102,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\jp\osakana4242\itunes_furikake\YomiWord.cs" />
+    <Compile Include="src\jp\osakana4242\itunes_furikake\TemporaryListPool.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\BuildFlag.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\LogOperator.cs" />
     <Compile Include="src\jp\osakana4242\itunes_furikake\FormExt.cs" />

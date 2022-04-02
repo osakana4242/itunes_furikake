@@ -15,13 +15,17 @@ using Timer = System.Windows.Forms.Timer;
 namespace jp.osakana4242.itunes_furikake {
 	// 進捗状況を表示するダイアログ。
 	public partial class ProgressDialog : Form {
-		private object workArg;
-		private ProgressResult result;
-		private RootForm rootForm;
+		public static DateTimeOffset lastPaintTime;
+		public static Thread mainThread_;
+
+		object workArg;
+		ProgressResult result;
+		RootForm rootForm;
 		System.Action<ProgressResult> onCompleted;
 		string titleTextLeft = "";
 		string bodyTextLeft = "";
-		public static DateTimeOffset lastPaintTime;
+		Timer timer_ = new Timer();
+
 
 		public static IObservable<T> ShowDialogAsync<T>(RootForm root, ProgressDialog.Config config, IObservable<T> stream) {
 			System.Action<BackgroundWorker, DoWorkEventArgs, int> onProgress = (_bw, _evtArgs, _prm) => {
@@ -65,25 +69,26 @@ namespace jp.osakana4242.itunes_furikake {
 		public static void ShowDialog<T>(RootForm root, ProgressDialog.Config config, T prm, System.Action<BackgroundWorker, DoWorkEventArgs, T> onProgress, System.Action<ProgressResult> onCompleted, System.Action<System.Exception> onError) {
 			ProgressDialog progressDialog = null;
 			System.Exception ex = null;
-			progressDialog = new ProgressDialog(root, config, (_sender, _e) => {
-				// ここは別スレッド処理.
-				try {
-					onProgress((BackgroundWorker)_sender, _e, (T)_e.Argument);
-				} catch (CancelException) {
-					// 中断
-				} catch (Exception ex2) {
-					// メインスレッドで通知したい.
-					ex = ex2;
+			progressDialog = new ProgressDialog(root, config,
+				(_sender, _e) => {
+					// ここは別スレッド処理.
+					try {
+						onProgress((BackgroundWorker)_sender, _e, (T)_e.Argument);
+					} catch (Exception ex2) {
+						// メインスレッドで通知したい.
+						ex = ex2;
+					}
+				},
+				prm,
+				_result => {
+					if (null != ex) {
+						onError(ex);
+						ex = null;
+					} else {
+						onCompleted(_result);
+					}
 				}
-
-			}, prm, _r => {
-				if (null != ex) {
-					onError(ex);
-					ex = null;
-				} else {
-					onCompleted(_r);
-				}
-			});
+			);
 			progressDialog.ShowDialog(root);
 		}
 
@@ -114,7 +119,6 @@ namespace jp.osakana4242.itunes_furikake {
 				lastPaintTime = DateTimeOffset.Now;
 			};
 		}
-		Timer timer_ = new Timer();
 
 		public void SetProgressParams(string label, int value, int minValue, int maxValue) {
 			this.label1.Text = label;
@@ -169,7 +173,6 @@ namespace jp.osakana4242.itunes_furikake {
 			}
 			this.Close();
 		}
-		public static Thread mainThread_;
 
 		private void ProgressDialog_Shown(object sender, EventArgs e) {
 			mainThread_ = Thread.CurrentThread;

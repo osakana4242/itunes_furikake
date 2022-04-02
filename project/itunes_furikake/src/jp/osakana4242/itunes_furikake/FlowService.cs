@@ -30,7 +30,7 @@ namespace jp.osakana4242.itunes_furikake {
 						OkCancelDialog.ShowOK(owner, "", _result1.errorMessage);
 					}
 				}, _ex => {
-					ErrorDialog.ShowUnknown(owner, _ex);
+					ErrorDialog.TryShowException(owner, _ex);
 				});
 		}
 
@@ -68,7 +68,7 @@ namespace jp.osakana4242.itunes_furikake {
 
 			foreach (IITTrack trackBase in tracks) {
 				// 中断.
-				if (bgWorker.CancellationPending) throw new CancelException();
+				if (bgWorker.CancellationPending) throw CancelException.Instance;
 				// 1トラック分の処理.
 				trackNameForDisplay = getTrackNameSafe(trackBase);
 				try {
@@ -149,14 +149,7 @@ namespace jp.osakana4242.itunes_furikake {
 				Subscribe(_ => {
 					// 完了.
 				}, _ex => {
-					if (_ex is CancelException) return; // キャンセルの場合はお咎めなし.
-
-					if (_ex is AppDisplayableException ex) {
-						ErrorDialog.Show(owner, ex.displayMessage);
-					} else {
-						ErrorDialog.ShowUnknown(owner, _ex);
-
-					}
+					ErrorDialog.TryShowException(owner, _ex);
 				});
 		}
 
@@ -362,6 +355,7 @@ namespace jp.osakana4242.itunes_furikake {
 	}
 
 	public class CancelException : System.Exception {
+
 		public static readonly CancelException Instance = new CancelException();
 	}
 }

@@ -31,7 +31,11 @@ namespace jp.osakana4242.itunes_furikake {
 			if (BuildFlag.IsDebug) {
 				Console.WriteLine($"ex: {ex}");
 			}
-			this.displayMessage = displayMessage;
+			string BR = System.Environment.NewLine;
+			this.displayMessage =
+				displayMessage + BR +
+				BR +
+				string.Format(global::jp.osakana4242.itunes_furikake.Properties.Resources.StrErrDetailBlock, ex);
 		}
 
 	}

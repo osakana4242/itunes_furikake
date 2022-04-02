@@ -42,7 +42,6 @@ namespace jp.osakana4242.itunes_furikake {
 				// 進捗を表示する.
 				ProgressDialog.Config config = new ProgressDialog.Config();
 
-
 				return ProgressDialog.ShowDialogAsync(null, config, 0, (_bw, _evtArgs, _prm) => {
 					var progress = 0;
 					var progressTotal = 2;
@@ -70,15 +69,21 @@ namespace jp.osakana4242.itunes_furikake {
 						isEndStream = true;
 					});
 
+					System.Exception ex2 = null;
 					var disposer = stream.Subscribe(_result => {
 						result.result = _result;
+					}, _ex => {
+						ex2 = _ex;
 					});
 
 					while (!isEndStream) {
 						if (_bw.CancellationPending) {
 							disposer.Dispose();
-							return;
+							throw CancelException.Instance;
 						}
+					}
+					if (null != ex2) {
+						throw ex2;
 					}
 				});
 			}).
@@ -89,7 +94,7 @@ namespace jp.osakana4242.itunes_furikake {
 				Select(_ => Unit.Default).
 				Take(1);
 			}).Catch((System.Exception _ex) => {
-				ShowException(_ex);
+				ErrorDialog.TryShowException(_ex);
 				return Observable.Return(Unit.Default);
 			}).
 			Finally(() => {
@@ -106,17 +111,7 @@ namespace jp.osakana4242.itunes_furikake {
 			try {
 				Application.Run();
 			} catch (System.Exception ex) {
-				ShowException(ex);
-			}
-		}
-
-		static void ShowException(System.Exception ex) {
-			if (ex is AppDisplayableException ex1) {
-				ErrorDialog.Show(null, ex1.displayMessage);
-			} else if (ex is FileNotFoundException ex2) {
-				ErrorDialog.ShowUnknown(null, ex2);
-			} else {
-				ErrorDialog.ShowUnknown(null, ex);
+				ErrorDialog.TryShowException(ex);
 			}
 		}
 

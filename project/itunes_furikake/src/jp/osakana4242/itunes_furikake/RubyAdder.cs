@@ -49,7 +49,7 @@ namespace jp.osakana4242.itunes_furikake {
 			dictZen2Han = LoadHelper.ReadDictC("dict/dict_zen2han.txt");
 
 			this.imeLanguage = new ImeLanguage();
-			this.iTunesApp = new iTunesApp();
+			this.iTunesApp = createiTunesApp();
 		}
 
 		public void Dispose() {
@@ -60,6 +60,37 @@ namespace jp.osakana4242.itunes_furikake {
 			if (this.imeLanguage != null) {
 				this.imeLanguage.Dispose();
 				this.imeLanguage = null;
+			}
+		}
+
+		static iTunesApp createiTunesApp() {
+			try {
+				return new iTunesApp();
+			} catch (System.Exception ex) {
+				if (ex.Message.Contains("CO_E_SERVER_EXEC_FAILURE")) {
+					// iTunes 初回起動時の規約確認で拒否して、 iTunes を終了させたとき:
+					// System.Runtime.InteropServices.COMException: CLSID {DC0C2640-1415-4644-875C-6F4D769839BA} を含むコンポーネントの COM クラス ファクトリを取得中に、次のエラーが発生しました: 80080005 サーバーの実行に失敗しました (HRESULT からの例外:0x80080005 (CO_E_SERVER_EXEC_FAILURE))。
+					//    場所 System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)
+					//    場所 System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+					//    場所 System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+					//    場所 System.Activator.CreateInstance(Type type, Boolean nonPublic)
+					//    場所 System.Activator.CreateInstance(Type type) 
+					//    場所 jp.osakana4242.itunes_furikake.RubyAdder.Init() 場所 C:\Users\osakana4242\prj\itunes_furikake\project\itunes_furikake\src\jp\osakana4242\itunes_furikake\RubyAdder.cs:行 53
+					throw new AppDisplayableException(Resources.StrErriTunesExecFailure, ex);
+				} else {
+					// iTunes をアンインストールした状態のとき:
+					//  System.Runtime.InteropServices.COMException (0x80040154): CLSID {DC0C2640-1415-4644-875C-6F4D769839BA} を含むコンポーネントの COM クラス ファクトリを取得中に、次のエラーが発生しました: 80040154 クラスが登録されていません (HRESULT からの例外:0x80040154 (REGDB_E_CLASSNOTREG))。
+					//     場所 System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)
+					//     場所 System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+					//     場所 System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+					//     場所 System.Activator.CreateInstance(Type type, Boolean nonPublic)
+					//     場所 System.Activator.CreateInstance(Type type)
+					//     場所 jp.osakana4242.itunes_furikake.RubyAdder.Init()
+					//     場所 jp.osakana4242.itunes_furikake.RootForm..ctor()
+					//     場所 jp.osakana4242.itunes_furikake.Program.<>c__DisplayClass1_1.<Main>b__8(Int32 _2)
+					//     場所 System.Reactive.Linq.ObservableImpl.Select`2.Selector._.OnNext(TSource value)
+					throw new AppDisplayableException(Resources.StrErriTunesNotFound, ex);
+				}
 			}
 		}
 

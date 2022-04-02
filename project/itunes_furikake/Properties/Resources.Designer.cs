@@ -19,7 +19,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -47,7 +47,7 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   すべてについて、現在のスレッドの CurrentUICulture プロパティをオーバーライドします
+        ///   厳密に型指定されたこのリソース クラスを使用して、すべての検索リソースに対し、
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -183,6 +183,17 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
+        ///   ---- エラー詳細ここから ----
+        ///{0}
+        ///---- エラー詳細ここまで ---- に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErrDetailBlock {
+            get {
+                return ResourceManager.GetString("StrErrDetailBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ファイルが見つかりません。
         ///ファイル: {0} に類似しているローカライズされた文字列を検索します。
         /// </summary>
@@ -202,13 +213,29 @@ namespace jp.osakana4242.itunes_furikake.Properties {
         }
         
         /// <summary>
-        ///   不明なエラーが発生しました。
-        ///
-        ///エラーの詳細: {0} に類似しているローカライズされた文字列を検索します。
+        ///   不明なエラーが発生しました。 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StrErrFormUnknown {
             get {
                 return ResourceManager.GetString("StrErrFormUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   iTunes の起動に失敗しました。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErriTunesExecFailure {
+            get {
+                return ResourceManager.GetString("StrErriTunesExecFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   iTunes がインストール済みか確認してください。 iTunes にアクセス出来ませんでした。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StrErriTunesNotFound {
+            get {
+                return ResourceManager.GetString("StrErriTunesNotFound", resourceCulture);
             }
         }
         

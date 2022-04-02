@@ -39,7 +39,7 @@ namespace jp.osakana4242.itunes_furikake {
 			if (now < nextSleep) return;
 			// 再描画待ち.
 			while (ProgressDialog.lastPaintTime <= nextSleep) {
-				if (bw.CancellationPending) throw new CancelException();
+				if (bw.CancellationPending) throw CancelException.Instance;
 				if (Thread.CurrentThread == ProgressDialog.mainThread_) return;
 				Thread.Sleep(100);
 				bw.ReportProgress((int)(state.Progress.Normalized()), state);

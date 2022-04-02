@@ -138,9 +138,7 @@
 Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
   <data name="StrErrFormUnknown" xml:space="preserve">
-    <value>不明なエラーが発生しました。
-
-エラーの詳細: {0}</value>
+    <value>不明なエラーが発生しました。</value>
   </data>
   <data name="StrExecuting" xml:space="preserve">
     <value>処理中</value>
@@ -242,5 +240,16 @@ Web： https://osakana4242.sakura.ne.jp/</value>
   </data>
   <data name="StrStartupFormTitle" xml:space="preserve">
     <value>iTunesふりかけ - 起動中</value>
+  </data>
+  <data name="StrErrDetailBlock" xml:space="preserve">
+    <value>---- エラー詳細ここから ----
+{0}
+---- エラー詳細ここまで ----</value>
+  </data>
+  <data name="StrErriTunesExecFailure" xml:space="preserve">
+    <value>iTunes の起動に失敗しました。</value>
+  </data>
+  <data name="StrErriTunesNotFound" xml:space="preserve">
+    <value>iTunes がインストール済みか確認してください。 iTunes にアクセス出来ませんでした。</value>
   </data>
 </root>

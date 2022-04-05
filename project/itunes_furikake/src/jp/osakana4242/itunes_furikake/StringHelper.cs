@@ -27,6 +27,12 @@ namespace jp.osakana4242.itunes_furikake {
 			return c <= 0x7f;
 		}
 
+		/// <summary>半角 or 全角の数字か</summary>
+		public static bool IsDigit(char c) {
+			return ('0' <= c && c <= '9') ||
+				('０' <= c && c <= '９');
+		}
+
 		// 文字がひらがなか、カタカナか、漢字か、英数字か調べる.
 		// from: https://dobon.net/vb/dotnet/string/ishiragana.html
 

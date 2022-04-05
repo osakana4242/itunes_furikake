@@ -9,12 +9,13 @@ namespace jp.osakana4242.itunes_furikake {
 
 	public static class YomiWordUtil {
 
-		/// <summary>読みをふる対象の文字(ひらがな、カタカナ、漢字)か</summary>
+		/// <summary>読みをふる対象の文字(ひらがな、カタカナ、漢字、数字)か</summary>
 		public static bool IsYomiTarget(string str, int index, out int length) {
 			var c = str[index];
 			var hasNextC = index + 1 < str.Length;
 			length = (char.IsHighSurrogate(c) && hasNextC) ? 2 : 1;
 
+			if (StringHelper.IsDigit(c)) return true;
 			if (StringHelper.IsHiragana(c)) return true;
 			if (StringHelper.IsKatakana(c)) return true;
 			if (StringHelper.IsKanji(str, index)) return true;

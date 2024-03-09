@@ -84,7 +84,7 @@ namespace jp.osakana4242.itunes_furikake
             this.checkBoxRubyAddOverwrite.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyOverwrite;
             this.toolTip1.SetToolTip(this.checkBoxRubyAddOverwrite, global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyOverwriteTooltip);
             this.checkBoxRubyAddOverwrite.UseVisualStyleBackColor = true;
-            this.checkBoxRubyAddOverwrite.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBoxRubyAddOverwrite.CheckedChanged += new System.EventHandler(this.checkBoxRubyAddOverwrite_CheckedChanged);
             // 
             // console
             // 

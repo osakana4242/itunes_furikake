@@ -41,40 +41,8 @@ namespace jp.osakana4242.itunes_furikake
 		{
 		}
 
-		// ボタン：ひらがな.
-		private void button1_Click(object sender, EventArgs e)
-		{
-			this.StartOperation(RubyAdderOpeType.HIRAGANA);
-		}
-
-		// ボタン：カタカナ.
-		private void button5_Click(object sender, EventArgs e)
-		{
-			this.StartOperation(RubyAdderOpeType.KATAKANA);
-		}
-
-		// ボタン：アルファベット.
-		private void button2_Click(object sender, EventArgs e)
-		{
-			this.StartOperation(RubyAdderOpeType.ALPHABET);
-		}
-
-		// ボタン：クリア.
-		private void button3_Click(object sender, EventArgs e)
-		{
-			this.StartOperation(RubyAdderOpeType.CLEAR);
-		}
-
-		// ボタン：バージョン情報の表示.
-		private void button4_Click(object sender, EventArgs e)
-		{
-			VersionForm versionForm = new VersionForm();
-			versionForm.ShowDialog(this);
-			versionForm.Dispose();
-		}
-
 		// 強制書き換えチェックボックス。
-		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		private void checkBoxRubyAddOverwrite_CheckedChanged(object sender, EventArgs e)
 		{
 		}
 
@@ -90,16 +58,6 @@ namespace jp.osakana4242.itunes_furikake
 			{
 				versionForm.ShowDialog(this);
 			}
-		}
-
-		private void 全角英数を半角にするToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			StartOperation(RubyAdderOpeType.ZEN2HAN);
-		}
-
-
-		private void 両端の空白を除去するToolStripMenuItem_Click(object sender, EventArgs e) {
-			StartOperation(RubyAdderOpeType.TRIM);
 		}
 
 		private void 存在しないトラックを削除するToolStripMenuItem_Click(object sender, EventArgs e)
@@ -154,11 +112,6 @@ namespace jp.osakana4242.itunes_furikake
 			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
 		}
 
-		private void button4_Click_1(object sender, EventArgs e)
-		{
-
-		}
-
 		private void RootForm_Activated(object sender, EventArgs e)
 		{
 		}
@@ -181,15 +134,7 @@ namespace jp.osakana4242.itunes_furikake
 			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
 
-		private void radioButton1_CheckedChanged(object sender, EventArgs e) {
-
-		}
-
 		private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e) {
-
-		}
-
-		private void radioButton2_CheckedChanged(object sender, EventArgs e) {
 
 		}
 

@@ -17,11 +17,16 @@ namespace jp.osakana4242.itunes_furikake
 {
 	public partial class RootForm : Form
 	{
-		public RubyAdder rubyAdder;
+		public readonly RubyAdder rubyAdder;
+		readonly Dictionary<RubyAdderRubyType, RadioButton> radioButtonsForRubyAddType_;
 
 		public RootForm()
 		{
 			InitializeComponent();
+			radioButtonsForRubyAddType_ = new Dictionary<RubyAdderRubyType, RadioButton> {
+				{ RubyAdderRubyType.Hiragana, radioButtonRubyAddTypeHiragana },
+				{ RubyAdderRubyType.Alphabet, radioButtonRubyAddTypeAlphabet },
+			};
 			this.rubyAdder = new RubyAdder();
 			this.rubyAdder.Init();
 			this.rubyAdder.SetLogger(this.AddLog);
@@ -107,7 +112,7 @@ namespace jp.osakana4242.itunes_furikake
 			console.Clear();
 			this.Enabled = false;
 			rubyAdder.opeData.ope = ope;
-			rubyAdder.opeData.isForceAdd = checkBox1.Checked;
+			rubyAdder.opeData.isForceAdd = checkBoxRubyAddOverwrite.Checked;
 			rubyAdder.opeData.progress = 0;
 			rubyAdder.opeData.total = 0;
 
@@ -135,17 +140,17 @@ namespace jp.osakana4242.itunes_furikake
                 selectedTracksCount = 0;
             }
 
+			foreach ( var kv in radioButtonsForRubyAddType_ ) {
+				kv.Value.Enabled = kv.Key == rubyAdder.opeData.rubyType;
+			}
+
 			var hasSelectedTrack = 0 < selectedTracksCount;
 			this.toolStripStatusLabel1.Text = hasSelectedTrack ?
 				string.Format(Properties.Resources.StrRootFormStatusBar1, selectedTracksCount) :
 				Properties.Resources.StrRootFormStatusBar2;
 
-			this.button1.Enabled = hasSelectedTrack;
-			this.button2.Enabled = hasSelectedTrack;
-			this.button3.Enabled = hasSelectedTrack;
-			this.button5.Enabled = hasSelectedTrack;
-			this.全角英数を半角にするToolStripMenuItem.Enabled = hasSelectedTrack;
-			this.両端の空白を除去するToolStripMenuItem.Enabled = hasSelectedTrack;
+			this.groupBoxRubyAdd.Enabled = this.checkBoxRubyAdd.Checked;
+			this.buttonApply.Enabled = hasSelectedTrack;
 			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
 		}
 
@@ -160,7 +165,7 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void RootForm_Shown(object sender, EventArgs e)
 		{
-			this.button1.Focus();
+			this.buttonApply.Focus();
 			UpdateComponentStatus();
 			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
@@ -174,6 +179,26 @@ namespace jp.osakana4242.itunes_furikake
 		{
             UpdateComponentStatus();
 			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
+		}
+
+		private void radioButton1_CheckedChanged(object sender, EventArgs e) {
+
+		}
+
+		private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e) {
+
+		}
+
+		private void radioButton2_CheckedChanged(object sender, EventArgs e) {
+
+		}
+
+		private void buttonApply_Click(object sender, EventArgs e) {
+
+		}
+
+		private void checkBoxRubyAddEnabled_CheckedChanged(object sender, EventArgs e) {
+			UpdateComponentStatus();
 		}
 	}
 }

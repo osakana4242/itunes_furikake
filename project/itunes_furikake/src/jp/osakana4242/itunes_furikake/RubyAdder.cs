@@ -94,7 +94,7 @@ namespace jp.osakana4242.itunes_furikake {
 			}
 		}
 
-		/** 処理を適用したペアを得る */
+		/// <summary>処理を適用したペアを得る</summary>
 		public static TrackFieldPair GetProcessedPair(RubyAdder rubyAdder, TrackFieldPair pair) {
 			switch (rubyAdder.opeData.ope) {
 				case RubyAdderOpeType.ZEN2HAN:
@@ -138,7 +138,7 @@ namespace jp.osakana4242.itunes_furikake {
 			return isNeedUpdateField || isNeedUpdateSortField;
 		}
 
-		/** 変化分を sb に追記する.  */
+		/// <summary>変化分を sb に追記する.</summary>
 		public static void AddDiff(RubyAdder rubyAdder, TrackFieldPair before, TrackFieldPair after, System.Text.StringBuilder sb) {
 			if (before.field != after.field) {
 				sb.AppendFormat("[{0}] -> [{1}]", before.field, after.field);
@@ -150,7 +150,7 @@ namespace jp.osakana4242.itunes_furikake {
 			}
 		}
 
-		/** トラックに対する処理の実行. */
+		/// <summary>トラックに対する処理の実行.</summary>
 		public static bool ExecTrack<T>(RubyAdder rubyAdder, IITFileOrCDTrack track, System.Text.StringBuilder sb, T prm1, System.Action<ProgressPair, T> reportFunc) {
 			bool hasUpdate = false;
 			var items = TrackFieldAccessor.items;

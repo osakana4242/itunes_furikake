@@ -125,12 +125,12 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void timer1_Tick(object sender, EventArgs e)
 		{
-            UpdateComponentStatus();
+			UpdateComponentStatus();
 		}
 
 		private void RootForm_SizeChanged(object sender, EventArgs e)
 		{
-            UpdateComponentStatus();
+			UpdateComponentStatus();
 			timer1.Enabled = this.WindowState != FormWindowState.Minimized;
 		}
 
@@ -139,7 +139,11 @@ namespace jp.osakana4242.itunes_furikake
 		}
 
 		private void buttonApply_Click(object sender, EventArgs e) {
-
+			UpdateComponentStatus();
+			if (!buttonApply.Enabled) {
+				return;
+			}
+			StartOperation(RubyAdderOpeType.APPLY);
 		}
 
 		private void checkBoxRubyAddEnabled_CheckedChanged(object sender, EventArgs e) {

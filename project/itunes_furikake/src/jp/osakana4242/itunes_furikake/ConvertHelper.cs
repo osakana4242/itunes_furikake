@@ -13,6 +13,8 @@ using jp.osakana4242.core.LogOperator;
 
 namespace jp.osakana4242.itunes_furikake {
 	public static class ConvertHelper {
+		static readonly char[] extraWhiteSpaces = { '　' };
+
 		public static string MakeSortField(RubyAdder rubyAdder, string baseField) {
 			if (baseField.Length <= 0) return "";
 
@@ -90,6 +92,13 @@ namespace jp.osakana4242.itunes_furikake {
 				sb.Append(nextC);
 			}
 			return sb.ToString();
+		}
+
+		/// <summary>両端の空白を除去する.</summary>
+		public static string Trim(RubyAdder rubyAdder, string src) {
+			var trimedAsciiWhiteSpace = src.Trim();
+			var trimedExtraWhiteSpace = trimedAsciiWhiteSpace.Trim(extraWhiteSpaces);
+			return trimedExtraWhiteSpace;
 		}
 
 		/// <summary>指定文字列を指定の辞書で置換.</summary>

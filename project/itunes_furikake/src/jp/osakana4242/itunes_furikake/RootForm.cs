@@ -92,6 +92,11 @@ namespace jp.osakana4242.itunes_furikake
 			StartOperation(RubyAdderOpeType.ZEN2HAN);
 		}
 
+
+		private void 両端の空白を除去するToolStripMenuItem_Click(object sender, EventArgs e) {
+			StartOperation(RubyAdderOpeType.TRIM);
+		}
+
 		private void 存在しないトラックを削除するToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			StartOperation(RubyAdderOpeType.DELETE_UNEXISTS);
@@ -140,6 +145,7 @@ namespace jp.osakana4242.itunes_furikake
 			this.button3.Enabled = hasSelectedTrack;
 			this.button5.Enabled = hasSelectedTrack;
 			this.全角英数を半角にするToolStripMenuItem.Enabled = hasSelectedTrack;
+			this.両端の空白を除去するToolStripMenuItem.Enabled = hasSelectedTrack;
 			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
 		}
 

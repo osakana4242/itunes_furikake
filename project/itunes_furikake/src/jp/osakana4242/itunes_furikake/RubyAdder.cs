@@ -99,6 +99,8 @@ namespace jp.osakana4242.itunes_furikake {
 			switch (rubyAdder.opeData.ope) {
 				case RubyAdderOpeType.ZEN2HAN:
 					return UpdateZenToHan(rubyAdder, pair);
+				case RubyAdderOpeType.TRIM:
+					return UpdateTrim(rubyAdder, pair);
 				case RubyAdderOpeType.CLEAR:
 					return ClearSortField(rubyAdder, pair);
 				default:
@@ -188,6 +190,12 @@ namespace jp.osakana4242.itunes_furikake {
 		public static TrackFieldPair UpdateZenToHan(RubyAdder rubyAdder, TrackFieldPair pair) {
 			pair.field = ConvertHelper.ToHankaku(rubyAdder, pair.field);
 			pair.sortField = ConvertHelper.ToHankaku(rubyAdder, pair.sortField);
+			return pair;
+		}
+
+		public static TrackFieldPair UpdateTrim(RubyAdder rubyAdder, TrackFieldPair pair) {
+			pair.field = ConvertHelper.Trim(rubyAdder, pair.field);
+			pair.sortField = ConvertHelper.Trim(rubyAdder, pair.sortField);
 			return pair;
 		}
 

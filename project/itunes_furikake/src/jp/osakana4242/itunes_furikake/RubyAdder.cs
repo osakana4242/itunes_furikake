@@ -96,16 +96,20 @@ namespace jp.osakana4242.itunes_furikake {
 
 		/// <summary>処理を適用したペアを得る</summary>
 		public static TrackFieldPair GetProcessedPair(RubyAdder rubyAdder, TrackFieldPair pair) {
-			switch (rubyAdder.opeData.ope) {
-				case RubyAdderOpeType.ZEN2HAN:
-					return UpdateZenToHan(rubyAdder, pair);
-				case RubyAdderOpeType.TRIM:
-					return UpdateTrim(rubyAdder, pair);
-				case RubyAdderOpeType.CLEAR:
-					return ClearSortField(rubyAdder, pair);
-				default:
-					return UpdateSortField(rubyAdder, pair);
+			var setting = rubyAdder.opeData.setting;
+			if (setting.isRubyRemove) {
+				pair = ClearSortField(rubyAdder, pair);
 			}
+			if (setting.rubyAdd.enabled) {
+				pair = UpdateSortField(rubyAdder, pair);
+			}
+			if (setting.isZenToHan) {
+				pair = UpdateZenToHan(rubyAdder, pair);
+			}
+			if (setting.isTrim) {
+				pair = UpdateTrim(rubyAdder, pair);
+			}
+ 			return pair;
 		}
 
 
@@ -158,10 +162,10 @@ namespace jp.osakana4242.itunes_furikake {
 			var total = items.Length;
 			reportFunc(new ProgressPair(progress, total), prm1);
 			foreach (var accessor in items) {
-				var pair = new TrackFieldPair() {
-					field = accessor.getField(track),
-					sortField = accessor.getSortField(track),
-				};
+				var pair = new TrackFieldPair(
+					field: accessor.getField(track),
+					sortField: accessor.getSortField(track)
+				);
 				var pairAfter = GetProcessedPair(rubyAdder, pair);
 				var prm2 = (reportFunc, prm1, progress, total);
 				hasUpdate |= SetFieldIfNeeded(rubyAdder, track, accessor, pair, pairAfter, prm2, (_p, _prm2) => {
@@ -175,28 +179,28 @@ namespace jp.osakana4242.itunes_furikake {
 		}
 
 		public static TrackFieldPair ClearSortField(RubyAdder rubyAdder, TrackFieldPair pair) {
-			pair.sortField = "";
-			return pair;
+			return pair.SetSortField("");
 		}
 
 		public static TrackFieldPair UpdateSortField(RubyAdder rubyAdder, TrackFieldPair pair) {
-			bool isWrite = rubyAdder.opeData.isForceAdd || pair.sortField.Length <= 0;
+			bool isWrite = rubyAdder.opeData.setting.rubyAdd.isForceAdd || pair.sortField.Length <= 0;
 			if (!isWrite) return pair;
 
-			pair.sortField = ConvertHelper.MakeSortField(rubyAdder, pair.field);
-			return pair;
+			return pair.SetSortField( ConvertHelper.MakeSortField(rubyAdder, pair.field) );
 		}
 
 		public static TrackFieldPair UpdateZenToHan(RubyAdder rubyAdder, TrackFieldPair pair) {
-			pair.field = ConvertHelper.ToHankaku(rubyAdder, pair.field);
-			pair.sortField = ConvertHelper.ToHankaku(rubyAdder, pair.sortField);
-			return pair;
+			return new TrackFieldPair(
+				field: ConvertHelper.ToHankaku(rubyAdder, pair.field),
+				sortField: ConvertHelper.ToHankaku(rubyAdder, pair.sortField)
+			);
 		}
 
 		public static TrackFieldPair UpdateTrim(RubyAdder rubyAdder, TrackFieldPair pair) {
-			pair.field = ConvertHelper.Trim(rubyAdder, pair.field);
-			pair.sortField = ConvertHelper.Trim(rubyAdder, pair.sortField);
-			return pair;
+			return new TrackFieldPair(
+				field: ConvertHelper.Trim(rubyAdder, pair.field),
+				sortField: ConvertHelper.Trim(rubyAdder, pair.sortField)
+			);
 		}
 
 		public static bool TryGetSelectedTracks(RubyAdder rubyAdder, out IITTrackCollection tracks) {

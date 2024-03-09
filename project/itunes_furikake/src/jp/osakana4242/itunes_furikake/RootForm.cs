@@ -19,6 +19,7 @@ namespace jp.osakana4242.itunes_furikake
 	{
 		public readonly RubyAdder rubyAdder;
 		readonly Dictionary<RubyAdderRubyType, RadioButton> radioButtonsForRubyAddType_;
+		int antiUpdateComponentStatusCount_;
 
 		public RootForm()
 		{
@@ -30,6 +31,7 @@ namespace jp.osakana4242.itunes_furikake
 			this.rubyAdder = new RubyAdder();
 			this.rubyAdder.Init();
 			this.rubyAdder.SetLogger(this.AddLog);
+			SettingToUI(rubyAdder.opeData.setting);
 
 			this.OnDestroyedAsObservableExt().Subscribe(_ =>
 			{
@@ -62,7 +64,7 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void 存在しないトラックを削除するToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			StartOperation(RubyAdderOpeType.DELETE_UNEXISTS);
+			StartOperation(RubyAdderOpeType.DeleteUnexistsTrack);
 		}
 
 		private void StartOperation(RubyAdderOpeType ope)
@@ -70,24 +72,64 @@ namespace jp.osakana4242.itunes_furikake
 			console.Clear();
 			this.Enabled = false;
 			rubyAdder.opeData.ope = ope;
-			rubyAdder.opeData.isForceAdd = checkBoxRubyAddOverwrite.Checked;
 			rubyAdder.opeData.progress = 0;
 			rubyAdder.opeData.total = 0;
 
-			switch (ope)
-			{
-				case RubyAdderOpeType.DELETE_UNEXISTS:
+			switch (ope) {
+				case RubyAdderOpeType.DeleteUnexistsTrack:
 					FlowService.DeleteTrackFlow(this, rubyAdder.opeData, rubyAdder.iTunesApp);
 					break;
-				default:
+				case RubyAdderOpeType.UpdateTrack:
 					FlowService.UpdateTrackFlow(this);
 					break;
+				default:
+					throw new System.NotSupportedException($"ope: {ope}");
 			}
+		}
+
+		void SettingToUI(RubyAdderOpeData.Setting setting) {
+			using (CreateAntiUpdateComponentStatusScope()) {
+				checkBoxRubyAdd.Checked = setting.rubyAdd.enabled;
+				groupBoxRubyAdd.Enabled = setting.rubyAdd.enabled;
+				checkBoxRubyAddOverwrite.Checked = setting.rubyAdd.isForceAdd;
+				foreach ( var kv in radioButtonsForRubyAddType_ ) {
+					var rubyType = kv.Key;
+					var radioButton = kv.Value;
+					radioButton.Checked = rubyType == setting.rubyAdd.rubyType;
+				}
+
+				//
+				checkBoxTrim.Checked = setting.isTrim;
+				checkBoxZenToHan.Checked = setting.isZenToHan;
+			}
+		}
+
+		RubyAdderOpeData.Setting GetSettingFromUI() {
+			var radioButtonsChecked = radioButtonsForRubyAddType_.Where(_v => _v.Value.Checked).ToArray();
+			var rubyType = (radioButtonsChecked.Length == 1) ?
+				radioButtonsChecked[0].Key :
+				RubyAdderOpeData.RubyAdd.Default.rubyType;
+
+			var setting = new RubyAdderOpeData.Setting(
+				new RubyAdderOpeData.RubyAdd(
+					enabled: checkBoxRubyAdd.Checked,
+					isForceAdd: checkBoxRubyAddOverwrite.Checked,
+					rubyType: rubyType
+				),
+				isRubyRemove: checkBoxRubyRemove.Checked,
+				isZenToHan: checkBoxZenToHan.Checked,
+				isTrim: checkBoxTrim.Checked
+			);
+			return setting;
 		}
 
         /// <summary>トラックの選択状態に応じて、各種コンポーネントの表示を切り替える.</summary>
         void UpdateComponentStatus()
 		{
+			var antiUpdateComponentStatusEnabled = 0 < antiUpdateComponentStatusCount_;
+			if (antiUpdateComponentStatusEnabled) {
+				return;
+			}
 			int selectedTracksCount;
             if (RubyAdder.TryGetSelectedTracks(rubyAdder, out var tracks))
             {
@@ -97,19 +139,17 @@ namespace jp.osakana4242.itunes_furikake
             {
                 selectedTracksCount = 0;
             }
-
-			foreach ( var kv in radioButtonsForRubyAddType_ ) {
-				kv.Value.Enabled = kv.Key == rubyAdder.opeData.rubyType;
-			}
+			var setting = GetSettingFromUI();
 
 			var hasSelectedTrack = 0 < selectedTracksCount;
 			this.toolStripStatusLabel1.Text = hasSelectedTrack ?
 				string.Format(Properties.Resources.StrRootFormStatusBar1, selectedTracksCount) :
 				Properties.Resources.StrRootFormStatusBar2;
-
-			this.groupBoxRubyAdd.Enabled = this.checkBoxRubyAdd.Checked;
-			this.buttonApply.Enabled = hasSelectedTrack;
+			this.groupBoxRubyAdd.Enabled = checkBoxRubyAdd.Checked;
+			this.buttonApply.Enabled = hasSelectedTrack && setting.HasTask();
 			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
+
+			rubyAdder.opeData.setting = setting;
 		}
 
 		private void RootForm_Activated(object sender, EventArgs e)
@@ -140,14 +180,40 @@ namespace jp.osakana4242.itunes_furikake
 
 		private void buttonApply_Click(object sender, EventArgs e) {
 			UpdateComponentStatus();
-			if (!buttonApply.Enabled) {
-				return;
-			}
-			StartOperation(RubyAdderOpeType.APPLY);
+			StartOperation(RubyAdderOpeType.UpdateTrack);
 		}
 
-		private void checkBoxRubyAddEnabled_CheckedChanged(object sender, EventArgs e) {
+		private void checkBoxRubyAdd_CheckedChanged(object sender, EventArgs e) {
+			if (checkBoxRubyAdd.Checked) {
+				using (CreateAntiUpdateComponentStatusScope()) {
+					checkBoxRubyRemove.Checked = false;
+				}
+			}
 			UpdateComponentStatus();
+		}
+
+		private void checkBoxRubyRemove_CheckedChanged(object sender, EventArgs e) {
+			if (checkBoxRubyRemove.Checked) {
+				using (CreateAntiUpdateComponentStatusScope()) {
+					checkBoxRubyAdd.Checked = false;
+				}
+			}
+			UpdateComponentStatus();
+		}
+
+		AntiUpdateComponentStatusScope CreateAntiUpdateComponentStatusScope() {
+			return new AntiUpdateComponentStatusScope(this);
+		}
+
+		readonly struct AntiUpdateComponentStatusScope : System.IDisposable {
+			readonly RootForm parent_;
+			public AntiUpdateComponentStatusScope(RootForm parent) {
+				parent_ = parent;
+				++parent_.antiUpdateComponentStatusCount_;
+			}
+			public void Dispose() {
+				--parent_.antiUpdateComponentStatusCount_;
+			}
 		}
 	}
 }

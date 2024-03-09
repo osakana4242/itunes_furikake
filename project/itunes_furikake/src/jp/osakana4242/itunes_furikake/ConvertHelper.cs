@@ -24,16 +24,16 @@ namespace jp.osakana4242.itunes_furikake {
 				ruby = baseField;
 			}
 
-			switch (rubyAdder.opeData.ope) {
-				case RubyAdderOpeType.HIRAGANA:
+			var rubyType = rubyAdder.opeData.setting.rubyAdd.rubyType;
+			switch (rubyType) {
+				case RubyAdderRubyType.Hiragana:
 					ruby = ToHiragana(rubyAdder, ruby);
 					break;
-				case RubyAdderOpeType.KATAKANA:
-					ruby = ToKatakana(rubyAdder, ruby);
-					break;
-				case RubyAdderOpeType.ALPHABET:
+				case RubyAdderRubyType.Alphabet:
 					ruby = ToAlphabet(rubyAdder, ruby);
 					break;
+				default:
+					throw new System.NotSupportedException($"rubyType: {rubyType}");
 			}
 			return ruby;
 		}

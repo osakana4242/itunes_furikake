@@ -33,7 +33,7 @@ using System.Resources;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.3.2.0")]
+[assembly: AssemblyVersion("2.4.0.0")]
 // [assembly: AssemblyFileVersion("0.0.0.0")]
 // [assembly: AssemblyInformationalVersion("0.0.0.0")]
 // from: https://atmarkit.itmedia.co.jp/fdotnet/dotnettips/187asmverinfo/asmverinfo.html

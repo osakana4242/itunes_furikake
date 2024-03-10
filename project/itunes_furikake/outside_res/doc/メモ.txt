@@ -1,6 +1,6 @@
 「iTunesふりかけ」
 
-バージョン: 2.3.2
+バージョン: 2.4.0
 作: 三途の川おさかな
 mail: osakana4242@gmail.com
 web: https://osakana4242.sakura.ne.jp/

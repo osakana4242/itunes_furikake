@@ -54,7 +54,7 @@ namespace jp.osakana4242.itunes_furikake
 			this.console.AppendText(str);
 		}
 
-		private void バージョン情報ToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ToolStripMenuItemVersionInfo_Click(object sender, EventArgs e)
 		{
 			using (var versionForm = new VersionForm())
 			{
@@ -62,7 +62,7 @@ namespace jp.osakana4242.itunes_furikake
 			}
 		}
 
-		private void 存在しないトラックを削除するToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ToolStripMenuItemRemoveunexistsTrack_Click(object sender, EventArgs e)
 		{
 			StartOperation(RubyAdderOpeType.DeleteUnexistsTrack);
 		}
@@ -147,7 +147,7 @@ namespace jp.osakana4242.itunes_furikake
 				Properties.Resources.StrRootFormStatusBar2;
 			this.groupBoxRubyAdd.Enabled = checkBoxRubyAdd.Checked;
 			this.buttonApply.Enabled = hasSelectedTrack && setting.HasTask();
-			this.存在しないトラックを削除するToolStripMenuItem.Enabled = hasSelectedTrack;
+			this.ToolStripMenuItemRemoveUnexistsTrack.Enabled = hasSelectedTrack;
 
 			rubyAdder.opeData.setting = setting;
 		}
@@ -198,6 +198,14 @@ namespace jp.osakana4242.itunes_furikake
 					checkBoxRubyAdd.Checked = false;
 				}
 			}
+			UpdateComponentStatus();
+		}
+
+		private void checkBoxZenToHan_CheckedChanged(object sender, EventArgs e) {
+			UpdateComponentStatus();
+		}
+
+		private void checkBoxTrim_CheckedChanged(object sender, EventArgs e) {
 			UpdateComponentStatus();
 		}
 

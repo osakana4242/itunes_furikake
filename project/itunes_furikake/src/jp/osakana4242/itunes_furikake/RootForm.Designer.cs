@@ -32,27 +32,28 @@ namespace jp.osakana4242.itunes_furikake
         {
 			this.components = new System.ComponentModel.Container();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.checkBoxRubyAdd = new System.Windows.Forms.CheckBox();
 			this.checkBoxRubyAddOverwrite = new System.Windows.Forms.CheckBox();
+			this.buttonApply = new System.Windows.Forms.Button();
+			this.checkBoxRubyAdd = new System.Windows.Forms.CheckBox();
 			this.console = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.コマンドToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.存在しないトラックを削除するToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.ヘルプToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.バージョン情報ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ToolStripMenuItemRemoveUnexistsTrack = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemVersionInfo = new System.Windows.Forms.ToolStripMenuItem();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.labelHead = new System.Windows.Forms.Label();
+			this.checkBoxRubyRemove = new System.Windows.Forms.CheckBox();
+			this.checkBoxTrim = new System.Windows.Forms.CheckBox();
+			this.checkBoxZenToHan = new System.Windows.Forms.CheckBox();
 			this.groupBoxRubyAdd = new System.Windows.Forms.GroupBox();
 			this.groupBoxRubyAddType = new System.Windows.Forms.GroupBox();
 			this.radioButtonRubyAddTypeAlphabet = new System.Windows.Forms.RadioButton();
 			this.radioButtonRubyAddTypeHiragana = new System.Windows.Forms.RadioButton();
-			this.buttonApply = new System.Windows.Forms.Button();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
-			this.checkBoxZenToHan = new System.Windows.Forms.CheckBox();
-			this.checkBoxTrim = new System.Windows.Forms.CheckBox();
-			this.checkBoxRubyRemove = new System.Windows.Forms.CheckBox();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -63,16 +64,11 @@ namespace jp.osakana4242.itunes_furikake
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// checkBoxRubyAdd
+			// toolTip1
 			// 
-			this.checkBoxRubyAdd.Location = new System.Drawing.Point(21, 6);
-			this.checkBoxRubyAdd.Name = "checkBoxRubyAdd";
-			this.checkBoxRubyAdd.Size = new System.Drawing.Size(77, 23);
-			this.checkBoxRubyAdd.TabIndex = 16;
-			this.checkBoxRubyAdd.Text = "読みを振る";
-			this.toolTip1.SetToolTip(this.checkBoxRubyAdd, global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandRubyOverwriteTooltip);
-			this.checkBoxRubyAdd.UseVisualStyleBackColor = true;
-			this.checkBoxRubyAdd.CheckedChanged += new System.EventHandler(this.checkBoxRubyAdd_CheckedChanged);
+			this.toolTip1.AutoPopDelay = 6200;
+			this.toolTip1.InitialDelay = 10;
+			this.toolTip1.ReshowDelay = 124;
 			// 
 			// checkBoxRubyAddOverwrite
 			// 
@@ -85,16 +81,25 @@ namespace jp.osakana4242.itunes_furikake
 			this.checkBoxRubyAddOverwrite.UseVisualStyleBackColor = true;
 			this.checkBoxRubyAddOverwrite.CheckedChanged += new System.EventHandler(this.checkBoxRubyAddOverwrite_CheckedChanged);
 			// 
-			// checkBoxRubyRemove
+			// buttonApply
 			// 
-			this.checkBoxRubyRemove.AutoSize = true;
-			this.checkBoxRubyRemove.Location = new System.Drawing.Point(12, 154);
-			this.checkBoxRubyRemove.Name = "checkBoxRubyRemove";
-			this.checkBoxRubyRemove.Size = new System.Drawing.Size(78, 16);
-			this.checkBoxRubyRemove.TabIndex = 17;
-			this.checkBoxRubyRemove.Text = "読みを消す";
-			this.checkBoxRubyRemove.UseVisualStyleBackColor = true;
-			this.checkBoxRubyRemove.CheckedChanged += new System.EventHandler(this.checkBoxRubyRemove_CheckedChanged);
+			this.buttonApply.Location = new System.Drawing.Point(217, 271);
+			this.buttonApply.Name = "buttonApply";
+			this.buttonApply.Size = new System.Drawing.Size(75, 23);
+			this.buttonApply.TabIndex = 14;
+			this.buttonApply.Text = "適用";
+			this.buttonApply.UseVisualStyleBackColor = true;
+			this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
+			// 
+			// checkBoxRubyAdd
+			// 
+			this.checkBoxRubyAdd.Location = new System.Drawing.Point(21, 40);
+			this.checkBoxRubyAdd.Name = "checkBoxRubyAdd";
+			this.checkBoxRubyAdd.Size = new System.Drawing.Size(77, 23);
+			this.checkBoxRubyAdd.TabIndex = 16;
+			this.checkBoxRubyAdd.Text = "読みを振る";
+			this.checkBoxRubyAdd.UseVisualStyleBackColor = true;
+			this.checkBoxRubyAdd.CheckedChanged += new System.EventHandler(this.checkBoxRubyAdd_CheckedChanged);
 			// 
 			// console
 			// 
@@ -126,7 +131,7 @@ namespace jp.osakana4242.itunes_furikake
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.コマンドToolStripMenuItem,
-            this.ヘルプToolStripMenuItem});
+            this.toolStripMenuItemHelp});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(304, 24);
@@ -136,32 +141,32 @@ namespace jp.osakana4242.itunes_furikake
 			// コマンドToolStripMenuItem
 			// 
 			this.コマンドToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.存在しないトラックを削除するToolStripMenuItem});
+            this.ToolStripMenuItemRemoveUnexistsTrack});
 			this.コマンドToolStripMenuItem.Name = "コマンドToolStripMenuItem";
 			this.コマンドToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
 			this.コマンドToolStripMenuItem.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommand;
 			// 
-			// 存在しないトラックを削除するToolStripMenuItem
+			// ToolStripMenuItemRemoveUnexistsTrack
 			// 
-			this.存在しないトラックを削除するToolStripMenuItem.Name = "存在しないトラックを削除するToolStripMenuItem";
-			this.存在しないトラックを削除するToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-			this.存在しないトラックを削除するToolStripMenuItem.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandDelete;
-			this.存在しないトラックを削除するToolStripMenuItem.Click += new System.EventHandler(this.存在しないトラックを削除するToolStripMenuItem_Click);
+			this.ToolStripMenuItemRemoveUnexistsTrack.Name = "ToolStripMenuItemRemoveUnexistsTrack";
+			this.ToolStripMenuItemRemoveUnexistsTrack.Size = new System.Drawing.Size(197, 22);
+			this.ToolStripMenuItemRemoveUnexistsTrack.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuCommandDelete;
+			this.ToolStripMenuItemRemoveUnexistsTrack.Click += new System.EventHandler(this.ToolStripMenuItemRemoveunexistsTrack_Click);
 			// 
-			// ヘルプToolStripMenuItem
+			// toolStripMenuItemHelp
 			// 
-			this.ヘルプToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.バージョン情報ToolStripMenuItem});
-			this.ヘルプToolStripMenuItem.Name = "ヘルプToolStripMenuItem";
-			this.ヘルプToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-			this.ヘルプToolStripMenuItem.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuHelp;
+			this.toolStripMenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemVersionInfo});
+			this.toolStripMenuItemHelp.Name = "toolStripMenuItemHelp";
+			this.toolStripMenuItemHelp.Size = new System.Drawing.Size(48, 20);
+			this.toolStripMenuItemHelp.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuHelp;
 			// 
-			// バージョン情報ToolStripMenuItem
+			// toolStripMenuItemVersionInfo
 			// 
-			this.バージョン情報ToolStripMenuItem.Name = "バージョン情報ToolStripMenuItem";
-			this.バージョン情報ToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-			this.バージョン情報ToolStripMenuItem.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuHelpVersion;
-			this.バージョン情報ToolStripMenuItem.Click += new System.EventHandler(this.バージョン情報ToolStripMenuItem_Click);
+			this.toolStripMenuItemVersionInfo.Name = "toolStripMenuItemVersionInfo";
+			this.toolStripMenuItemVersionInfo.Size = new System.Drawing.Size(142, 22);
+			this.toolStripMenuItemVersionInfo.Text = global::jp.osakana4242.itunes_furikake.Properties.Resources.StrMenuHelpVersion;
+			this.toolStripMenuItemVersionInfo.Click += new System.EventHandler(this.ToolStripMenuItemVersionInfo_Click);
 			// 
 			// splitContainer1
 			// 
@@ -174,6 +179,7 @@ namespace jp.osakana4242.itunes_furikake
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.labelHead);
 			this.splitContainer1.Panel1.Controls.Add(this.checkBoxRubyRemove);
 			this.splitContainer1.Panel1.Controls.Add(this.checkBoxTrim);
 			this.splitContainer1.Panel1.Controls.Add(this.checkBoxZenToHan);
@@ -193,13 +199,55 @@ namespace jp.osakana4242.itunes_furikake
 			this.splitContainer1.TabIndex = 9;
 			this.splitContainer1.TabStop = false;
 			// 
+			// labelHead
+			// 
+			this.labelHead.AutoSize = true;
+			this.labelHead.Location = new System.Drawing.Point(10, 12);
+			this.labelHead.Name = "labelHead";
+			this.labelHead.Size = new System.Drawing.Size(206, 12);
+			this.labelHead.TabIndex = 18;
+			this.labelHead.Text = "選択したトラックに下記の処理を適用します";
+			// 
+			// checkBoxRubyRemove
+			// 
+			this.checkBoxRubyRemove.AutoSize = true;
+			this.checkBoxRubyRemove.Location = new System.Drawing.Point(12, 172);
+			this.checkBoxRubyRemove.Name = "checkBoxRubyRemove";
+			this.checkBoxRubyRemove.Size = new System.Drawing.Size(78, 16);
+			this.checkBoxRubyRemove.TabIndex = 17;
+			this.checkBoxRubyRemove.Text = "読みを消す";
+			this.checkBoxRubyRemove.UseVisualStyleBackColor = true;
+			this.checkBoxRubyRemove.CheckedChanged += new System.EventHandler(this.checkBoxRubyRemove_CheckedChanged);
+			// 
+			// checkBoxTrim
+			// 
+			this.checkBoxTrim.AutoSize = true;
+			this.checkBoxTrim.Location = new System.Drawing.Point(12, 238);
+			this.checkBoxTrim.Name = "checkBoxTrim";
+			this.checkBoxTrim.Size = new System.Drawing.Size(134, 16);
+			this.checkBoxTrim.TabIndex = 1;
+			this.checkBoxTrim.Text = "両端の空白を除去する";
+			this.checkBoxTrim.UseVisualStyleBackColor = true;
+			this.checkBoxTrim.CheckedChanged += new System.EventHandler(this.checkBoxTrim_CheckedChanged);
+			// 
+			// checkBoxZenToHan
+			// 
+			this.checkBoxZenToHan.AutoSize = true;
+			this.checkBoxZenToHan.Location = new System.Drawing.Point(12, 216);
+			this.checkBoxZenToHan.Name = "checkBoxZenToHan";
+			this.checkBoxZenToHan.Size = new System.Drawing.Size(133, 16);
+			this.checkBoxZenToHan.TabIndex = 0;
+			this.checkBoxZenToHan.Text = "全角英数を半角にする";
+			this.checkBoxZenToHan.UseVisualStyleBackColor = true;
+			this.checkBoxZenToHan.CheckedChanged += new System.EventHandler(this.checkBoxZenToHan_CheckedChanged);
+			// 
 			// groupBoxRubyAdd
 			// 
 			this.groupBoxRubyAdd.Controls.Add(this.groupBoxRubyAddType);
 			this.groupBoxRubyAdd.Controls.Add(this.checkBoxRubyAddOverwrite);
-			this.groupBoxRubyAdd.Location = new System.Drawing.Point(12, 11);
+			this.groupBoxRubyAdd.Location = new System.Drawing.Point(12, 45);
 			this.groupBoxRubyAdd.Name = "groupBoxRubyAdd";
-			this.groupBoxRubyAdd.Size = new System.Drawing.Size(207, 137);
+			this.groupBoxRubyAdd.Size = new System.Drawing.Size(280, 121);
 			this.groupBoxRubyAdd.TabIndex = 10;
 			this.groupBoxRubyAdd.TabStop = false;
 			// 
@@ -209,7 +257,7 @@ namespace jp.osakana4242.itunes_furikake
 			this.groupBoxRubyAddType.Controls.Add(this.radioButtonRubyAddTypeHiragana);
 			this.groupBoxRubyAddType.Location = new System.Drawing.Point(9, 51);
 			this.groupBoxRubyAddType.Name = "groupBoxRubyAddType";
-			this.groupBoxRubyAddType.Size = new System.Drawing.Size(192, 72);
+			this.groupBoxRubyAddType.Size = new System.Drawing.Size(265, 62);
 			this.groupBoxRubyAddType.TabIndex = 11;
 			this.groupBoxRubyAddType.TabStop = false;
 			this.groupBoxRubyAddType.Text = "読みの種類";
@@ -236,16 +284,6 @@ namespace jp.osakana4242.itunes_furikake
 			this.radioButtonRubyAddTypeHiragana.Text = "ひらがな";
 			this.radioButtonRubyAddTypeHiragana.UseVisualStyleBackColor = true;
 			// 
-			// buttonApply
-			// 
-			this.buttonApply.Location = new System.Drawing.Point(217, 281);
-			this.buttonApply.Name = "buttonApply";
-			this.buttonApply.Size = new System.Drawing.Size(75, 23);
-			this.buttonApply.TabIndex = 14;
-			this.buttonApply.Text = "適用";
-			this.buttonApply.UseVisualStyleBackColor = true;
-			this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
-			// 
 			// statusStrip1
 			// 
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -265,26 +303,6 @@ namespace jp.osakana4242.itunes_furikake
 			// 
 			this.timer1.Interval = 1000;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-			// 
-			// checkBoxZenToHan
-			// 
-			this.checkBoxZenToHan.AutoSize = true;
-			this.checkBoxZenToHan.Location = new System.Drawing.Point(12, 192);
-			this.checkBoxZenToHan.Name = "checkBoxZenToHan";
-			this.checkBoxZenToHan.Size = new System.Drawing.Size(133, 16);
-			this.checkBoxZenToHan.TabIndex = 0;
-			this.checkBoxZenToHan.Text = "全角英数を半角にする";
-			this.checkBoxZenToHan.UseVisualStyleBackColor = true;
-			// 
-			// checkBoxTrim
-			// 
-			this.checkBoxTrim.AutoSize = true;
-			this.checkBoxTrim.Location = new System.Drawing.Point(12, 214);
-			this.checkBoxTrim.Name = "checkBoxTrim";
-			this.checkBoxTrim.Size = new System.Drawing.Size(134, 16);
-			this.checkBoxTrim.TabIndex = 1;
-			this.checkBoxTrim.Text = "両端の空白を除去する";
-			this.checkBoxTrim.UseVisualStyleBackColor = true;
 			// 
 			// RootForm
 			// 
@@ -326,9 +344,9 @@ namespace jp.osakana4242.itunes_furikake
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem コマンドToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem ヘルプToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem バージョン情報ToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem 存在しないトラックを削除するToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemHelp;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemVersionInfo;
+		private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemRemoveUnexistsTrack;
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
@@ -343,6 +361,7 @@ namespace jp.osakana4242.itunes_furikake
 		private System.Windows.Forms.CheckBox checkBoxTrim;
 		private System.Windows.Forms.CheckBox checkBoxZenToHan;
 		private System.Windows.Forms.CheckBox checkBoxRubyRemove;
+		private System.Windows.Forms.Label labelHead;
 	}
 }
 

@@ -22,7 +22,6 @@ namespace jp.osakana4242.itunes_furikake {
 
 		public RubyAdderOpeData opeData = new RubyAdderOpeData();
 		public Dictionary<string, string> dictHiragana2Rome = new Dictionary<string, string>();
-		public Dictionary<string, string> dictHiragana2Katakana = new Dictionary<string, string>();
 		public Dictionary<string, string> dictWord2Hiragana = new Dictionary<string, string>();
 		public Dictionary<char, char> dictZen2Han = new Dictionary<char, char>();
 
@@ -44,7 +43,6 @@ namespace jp.osakana4242.itunes_furikake {
 
 		public void Init() {
 			dictHiragana2Rome = LoadHelper.ReadDictS("dict/dict_h2r.txt");
-			dictHiragana2Katakana = LoadHelper.ReadDictS("dict/dict_h2k.txt");
 			dictWord2Hiragana = LoadHelper.ReadDictS("dict/dict_word2h.txt");
 			dictZen2Han = LoadHelper.ReadDictC("dict/dict_zen2han.txt");
 

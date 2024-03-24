@@ -65,12 +65,6 @@ namespace jp.osakana4242.itunes_furikake {
 			return dest;
 		}
 
-		/// <summary>カタカナ化.</summary>
-		public static string ToKatakana(RubyAdder rubyAdder, string src) {
-			string hiragana = ToHiragana(rubyAdder, src);
-			return ToHoge(hiragana, rubyAdder.dictHiragana2Katakana);
-		}
-
 		/// <summary>アルファベット化.</summary>
 		public static string ToAlphabet(RubyAdder rubyAdder, string src) {
 			string hiragana = ToHiragana(rubyAdder, src);

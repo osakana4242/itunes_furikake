@@ -16,7 +16,7 @@ Windows10 標準搭載は 4.6
 * Release 版をリビルド
 * project/itunes_furikake/Release フォルダを release 下にコピーして
 itunes_furikake_v?_?_? にリネーム. 以降 product と呼ぶ.
-* project/itunes_furikake/docs/*.txt を product 下にコピー
+* project/itunes_furikake/outside_res/doc/*.txt を product 下にコピー
 * product/lib フォルダを作成し、各種 dll をこの中に移動する. xml は実行に不要な
 ので削除
 * zip にする
